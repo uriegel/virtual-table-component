@@ -9,7 +9,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/test/bin/Debug/net6.0/test.dll",
+            "program": "${workspaceFolder}/test/bin/Debug/net10.0/test.dll",
             "args": [],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,

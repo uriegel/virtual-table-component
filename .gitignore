@@ -1,5 +1,2 @@
-test/bin
-test/obj
-node_modules
-package-lock.json
-
+test/bin/Debug/
+test/obj/
