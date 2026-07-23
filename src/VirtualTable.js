@@ -129,10 +129,10 @@ export class VirtualTable extends HTMLElement {
     }
 
     scrollIntoView(newPos, up) {
+        console.log("into view", newPos, this.offset)
         if (!up) {
             if (newPos >= this.visualItemsCount) {
                 const delta = newPos - this.currentPosition
-                console.log(delta)
                 const elements = Array.from(this.tableBody.children) 
                 for (let i = 0; i < delta; i++) {
                     const recycled = this.tableBody.firstElementChild
@@ -145,21 +145,18 @@ export class VirtualTable extends HTMLElement {
                 return delta
             }
         } else {
-            console.log("newPos", newPos)
             if (newPos < this.offset) {
                 const delta = newPos - this.currentPosition
                 console.log(delta)
                 const elements = Array.from(this.tableBody.children) 
-                if (newPos > 0) {
+                if (newPos >= 0) {
                     for (let i = 0; i < -delta; i++) {
                         const recycled = this.tableBody.lastElementChild
                         recycled.remove()
-                        recycled.firstChild.textContent = this.items[newPos - 1]
+                        recycled.firstChild.textContent = this.items[newPos]
                         this.tableBody.insertBefore(recycled, this.tableBody.firstElementChild)
                     }
                 }
-
-                console.log("delta", delta)
                 this.offset += delta
                 return delta
             }
