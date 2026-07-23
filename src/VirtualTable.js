@@ -15,6 +15,7 @@ export class VirtualTable extends HTMLElement {
         this.itemHeight = 0
         this.currentPosition = 0
         this.offset = 0
+        this.visualItemsCount = 0
     }
     
     connectedCallback() {
@@ -54,7 +55,6 @@ export class VirtualTable extends HTMLElement {
                 outline-style: solid;
                 outline-offset: -1px;    
             }`
-            
 
         this.shadow.appendChild(style)
     }
@@ -62,20 +62,24 @@ export class VirtualTable extends HTMLElement {
     setItems(items) {
         this.items = items
         if (this.itemHeight == 0)
-            this.itemHeight = this.measure()
+            this.measure()
 
         while (this.tableBody.lastElementChild) 
             this.tableBody.removeChild(this.tableBody.lastElementChild)
 
-        items.forEach((item, idx) => {
-            const tr = document.createElement("tr")
-            if (idx == this.currentPosition)
-                tr.classList.add("isCurrent")
-            const td = document.createElement("td")
-            td.textContent = item
-            tr.appendChild(td)
-            this.tableBody.appendChild(tr)
-        })
+        const count = this.getVisualItems()
+
+        items
+            .filter((_, idx) => idx <= count)
+            .forEach((item, idx) => {
+                const tr = document.createElement("tr")
+                if (idx == this.currentPosition)
+                    tr.classList.add("isCurrent")
+                const td = document.createElement("td")
+                td.textContent = item
+                tr.appendChild(td)
+                this.tableBody.appendChild(tr)
+            })
     }
     measure() {
         const tr = document.createElement("tr")
@@ -83,14 +87,17 @@ export class VirtualTable extends HTMLElement {
         td.textContent = "item"
         tr.appendChild(td)
         this.tableBody.appendChild(tr)
-        const itemHeight = tr.offsetHeight
-        const bodyHeight = this.main.clientHeight
-        console.log(itemHeight, bodyHeight, bodyHeight / itemHeight)
-        return itemHeight
+        this.itemHeight = tr.offsetHeight
+        this.visualItemsCount = this.getVisualItems()
+        console.log(this.itemHeight, this.main.clientHeight, this.visualItemsCount)
+    }
+
+    getVisualItems() {
+        return Math.floor(this.main.clientHeight / this.itemHeight)
     }
 
     onResize() {
-        console.log("Resized", this.main.clientHeight, Math.floor(this.main.clientHeight / this.itemHeight))
+        console.log("Resized", this.main.clientHeight, this.visualItemsCount)
     }
 
     onKeyDown(evt) {
@@ -108,15 +115,56 @@ export class VirtualTable extends HTMLElement {
     }
 
     checkPosition(newPos) {
-        const up = newPos > this.currentPosition
-        newPos = up ? Math.min(newPos, this.items.length - 1) : Math.max(newPos, 0)
+        const up = newPos < this.currentPosition
+        newPos = up ? Math.max(newPos, 0) : Math.min(newPos, this.items.length - 1)
+        const delta =this.scrollIntoView(newPos, up)
         const elements = Array.from(this.tableBody.children) 
-        const element = elements[this.currentPosition]
+        const element = elements[this.currentPosition - this.offset]
         if (element)
             element.classList.remove("isCurrent")
-        const newElement = elements[newPos]
+        console.log("newPos - this.offset", newPos - this.offset)
+        const newElement = elements[newPos - this.offset]
         newElement.classList.add("isCurrent")
         this.currentPosition = newPos
+    }
+
+    scrollIntoView(newPos, up) {
+        if (!up) {
+            if (newPos >= this.visualItemsCount) {
+                const delta = newPos - this.currentPosition
+                console.log(delta)
+                const elements = Array.from(this.tableBody.children) 
+                for (let i = 0; i < delta; i++) {
+                    const recycled = this.tableBody.firstElementChild
+                    recycled.remove()
+                    recycled.firstChild.textContent = this.items[newPos + 1]
+                    this.tableBody.appendChild(recycled)
+                }
+
+                this.offset += delta
+                return delta
+            }
+        } else {
+            console.log("newPos", newPos)
+            if (newPos < this.offset) {
+                const delta = newPos - this.currentPosition
+                console.log(delta)
+                const elements = Array.from(this.tableBody.children) 
+                if (newPos > 0) {
+                    for (let i = 0; i < -delta; i++) {
+                        const recycled = this.tableBody.lastElementChild
+                        recycled.remove()
+                        recycled.firstChild.textContent = this.items[newPos - 1]
+                        this.tableBody.insertBefore(recycled, this.tableBody.firstElementChild)
+                    }
+                }
+
+                console.log("delta", delta)
+                this.offset += delta
+                return delta
+            }
+        }
+        return 0
     }
 }
 
