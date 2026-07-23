@@ -12,6 +12,9 @@ body {
     margin: 20px;
     flex-grow: 1;
     position: relative;
+    border-color: aqua;
+    border-width: 1px;
+    border-style: solid;
 }
 
 .hidden {
