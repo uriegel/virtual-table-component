@@ -1,7 +1,4 @@
 using System;
-using System.IO;
-using System.Threading.Tasks;
-using CsTools.Extensions;
 using WebServerLight;
 using WebServerLight.Routing;
 
@@ -13,7 +10,7 @@ WebServer
     .Http(port)
     .Route(MethodRoute
         .New(Method.Get)
-        .Request(GetFile))
+        .Add(WebSiteRoute.New()))
     .Build()
     .Start();
 
@@ -21,20 +18,3 @@ Console.WriteLine($"Running test server on http://localhost:{port}/test/index.ht
 Console.ReadLine(); 
 
 
-static async Task<bool> GetFile(IRequest request)
-{
-    try
-    {
-        var subPath = request.Url[1..];
-        if (subPath == null)
-            return false;
-        using var stream = File.OpenRead(subPath);
-
-        await request.SendAsync(stream, stream.Length, subPath?.GetFileExtension()?.ToMimeType() ?? "text/plain", new FileInfo(stream.Name).LastWriteTime);
-        return true;
-    }
-    catch (Exception)
-    {
-        return false;
-    }
-}
