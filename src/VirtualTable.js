@@ -1,12 +1,10 @@
-// TODO scrollintoview in checkPosition, add items above and remove items below
-// TODO PageUp PageDown
+// TODO WebserverLight with website request
+// TODO PageUp PageDown: scrollintoview
 // TODO Home End
 // TODO mouse scrolling 
 // TODO Resizing
 // TODO Scrollbar web component to scroll through this list
 // TODO Slot to render a new cell in the program with recycling
-
-// TODO WebserverLight with website request
 
 export class VirtualTable extends HTMLElement {
 
@@ -131,13 +129,13 @@ export class VirtualTable extends HTMLElement {
     scrollIntoView(newPos, up) {
         console.log("into view", newPos, this.offset)
         if (!up) {
-            if (newPos >= this.visualItemsCount) {
+            if (newPos - this.offset >= this.visualItemsCount) {
                 const delta = newPos - this.currentPosition
                 const elements = Array.from(this.tableBody.children) 
                 for (let i = 0; i < delta; i++) {
                     const recycled = this.tableBody.firstElementChild
                     recycled.remove()
-                    recycled.firstChild.textContent = this.items[newPos + 1]
+                    recycled.firstChild.textContent = this.items[newPos + 1 + i]
                     this.tableBody.appendChild(recycled)
                 }
 
@@ -153,7 +151,7 @@ export class VirtualTable extends HTMLElement {
                     for (let i = 0; i < -delta; i++) {
                         const recycled = this.tableBody.lastElementChild
                         recycled.remove()
-                        recycled.firstChild.textContent = this.items[newPos]
+                        recycled.firstChild.textContent = this.items[this.currentPosition - 1 - i]
                         this.tableBody.insertBefore(recycled, this.tableBody.firstElementChild)
                     }
                 }
