@@ -1,4 +1,3 @@
-// TODO Resizing
 // TODO Scrollbar web component to scroll through this list
 // TODO Slot to render a new cell in the program with recycling
 
@@ -133,6 +132,8 @@ export class VirtualTable extends HTMLElement {
                 this.tableBody.appendChild(tr)
             }
         }
+        // TODO check if too small
+        this.checkPosition(this.currentPosition)
     }
 
     onKeyDown(evt) {
