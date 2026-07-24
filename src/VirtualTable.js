@@ -1,9 +1,7 @@
 // TODO WebserverLight with website request
-// TODO Newpos at the end to large
-// TODO PageUp PageDown: scrollintoview
-// TODO Home End
-// TODO mouse scrolling 
+// TODO mouse select
 // TODO Resizing
+// TODO mouse scrolling 
 // TODO Scrollbar web component to scroll through this list
 // TODO Slot to render a new cell in the program with recycling
 
@@ -102,17 +100,36 @@ export class VirtualTable extends HTMLElement {
         if (evt.key == "ArrowDown") {
             evt.preventDefault()
             evt.stopPropagation()
-            this.checkPosition(this.currentPosition + 2)
+            this.checkPosition(this.currentPosition + 1)
         }
         else if (evt.key == "ArrowUp") {
             evt.preventDefault()
             evt.stopPropagation()
             this.checkPosition(this.currentPosition - 1)
         }
+        else if (evt.key == "PageDown") {
+            evt.preventDefault()
+            evt.stopPropagation()
+            this.checkPosition(this.currentPosition + this.visualItemsCount - 1)
+        }
+        else if (evt.key == "PageUp") {
+            evt.preventDefault()
+            evt.stopPropagation()
+            this.checkPosition(this.currentPosition - this.visualItemsCount + 1)
+        }
+        else if (evt.key == "End") {
+            evt.preventDefault()
+            evt.stopPropagation()
+            this.checkPosition(this.items.length - 1)
+        }
+        else if (evt.key == "Home") {
+            evt.preventDefault()
+            evt.stopPropagation()
+            this.checkPosition(0)
+        }
     }
 
     checkPosition(newPos) {
-        console.log("newPos", newPos)
         const up = newPos < this.currentPosition
         newPos = up ? Math.max(newPos, 0) : Math.min(newPos, this.items.length - 1)
         const delta =this.scrollIntoView(newPos, up)
@@ -127,33 +144,35 @@ export class VirtualTable extends HTMLElement {
 
     scrollIntoView(newPos, up) {
         if (!up) {
-            if (newPos - this.offset >= this.visualItemsCount) {
-                const delta = newPos - this.currentPosition
+            const offset = newPos - this.offset - this.visualItemsCount + 1
+            if (offset >= 0) {
                 const elements = Array.from(this.tableBody.children) 
-                for (let i = 0; i < delta; i++) {
+                for (let i = 0; i < offset; i++) { 
                     const recycled = this.tableBody.firstElementChild
                     recycled.remove()
-                    recycled.firstChild.textContent = this.items[newPos + 1 + i]
+                    recycled.classList.remove("isCurrent")
+                    recycled.firstChild.textContent = this.items[this.offset + this.visualItemsCount + 1 + i] 
                     this.tableBody.appendChild(recycled)
                 }
 
-                this.offset += delta
-                return delta
+                this.offset += offset
+                return offset
             }
         } else {
-            if (newPos < this.offset) {
-                const delta = newPos - this.currentPosition
+            const offset = newPos - this.offset
+            if (offset < 0) {
                 const elements = Array.from(this.tableBody.children) 
                 if (newPos >= 0) {
-                    for (let i = 0; i < -delta; i++) {
+                    for (let i = 0; i < -offset; i++) {
                         const recycled = this.tableBody.lastElementChild
                         recycled.remove()
-                        recycled.firstChild.textContent = this.items[this.currentPosition - 1 - i]
+                        recycled.classList.remove("isCurrent")
+                        recycled.firstChild.textContent = this.items[this.offset - 1 - i]
                         this.tableBody.insertBefore(recycled, this.tableBody.firstElementChild)
                     }
                 }
-                this.offset += delta
-                return delta
+                this.offset += offset
+                return offset
             }
         }
         return 0
