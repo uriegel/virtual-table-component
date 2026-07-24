@@ -1,4 +1,5 @@
 // TODO WebserverLight with website request
+// TODO Newpos at the end to large
 // TODO PageUp PageDown: scrollintoview
 // TODO Home End
 // TODO mouse scrolling 
@@ -87,7 +88,6 @@ export class VirtualTable extends HTMLElement {
         this.tableBody.appendChild(tr)
         this.itemHeight = tr.offsetHeight
         this.visualItemsCount = this.getVisualItems()
-        console.log(this.itemHeight, this.main.clientHeight, this.visualItemsCount)
     }
 
     getVisualItems() {
@@ -99,11 +99,10 @@ export class VirtualTable extends HTMLElement {
     }
 
     onKeyDown(evt) {
-        console.log(evt.key)
         if (evt.key == "ArrowDown") {
             evt.preventDefault()
             evt.stopPropagation()
-            this.checkPosition(this.currentPosition + 1)
+            this.checkPosition(this.currentPosition + 2)
         }
         else if (evt.key == "ArrowUp") {
             evt.preventDefault()
@@ -113,6 +112,7 @@ export class VirtualTable extends HTMLElement {
     }
 
     checkPosition(newPos) {
+        console.log("newPos", newPos)
         const up = newPos < this.currentPosition
         newPos = up ? Math.max(newPos, 0) : Math.min(newPos, this.items.length - 1)
         const delta =this.scrollIntoView(newPos, up)
@@ -120,14 +120,12 @@ export class VirtualTable extends HTMLElement {
         const element = elements[this.currentPosition - this.offset]
         if (element)
             element.classList.remove("isCurrent")
-        console.log("newPos - this.offset", newPos - this.offset)
         const newElement = elements[newPos - this.offset]
         newElement.classList.add("isCurrent")
         this.currentPosition = newPos
     }
 
     scrollIntoView(newPos, up) {
-        console.log("into view", newPos, this.offset)
         if (!up) {
             if (newPos - this.offset >= this.visualItemsCount) {
                 const delta = newPos - this.currentPosition
@@ -145,7 +143,6 @@ export class VirtualTable extends HTMLElement {
         } else {
             if (newPos < this.offset) {
                 const delta = newPos - this.currentPosition
-                console.log(delta)
                 const elements = Array.from(this.tableBody.children) 
                 if (newPos >= 0) {
                     for (let i = 0; i < -delta; i++) {
