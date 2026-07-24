@@ -1,3 +1,4 @@
+import './Scrollbar.js'
 // TODO Scrollbar web component to scroll through this list
 // TODO Slot to render a new cell in the program with recycling
 
@@ -24,6 +25,8 @@ export class VirtualTable extends HTMLElement {
         this.tableBody = document.createElement("tbody")
         this.table.appendChild(this.tableBody)
         this.main.appendChild(this.table)
+        this.scrollbar = document.createElement("scroll-bar")
+        this.main.appendChild(this.scrollbar)
         this.shadow.appendChild(this.main)
         this.setAttribute("tabindex", "0")
         this.addEventListener("focus", () => this.main.focus())
@@ -115,6 +118,7 @@ export class VirtualTable extends HTMLElement {
     }
 
     onResize() {
+        this.scrollbar.setHeight(this.tableBody.offsetHeight)
         if (this.items.length == 0)
             return
         const itemsCount = this.visualItemsCount

@@ -6,7 +6,7 @@ var port = 9882;
 
 WebServer
     .New()
-    .Logging(LogLevel.Trace)
+    .Logging(LogLevel.Error)
     .Http(port)
     .Route(MethodRoute
         .New(Method.Get)
