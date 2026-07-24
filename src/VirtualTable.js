@@ -1,4 +1,3 @@
-// TODO mouse select
 // TODO Resizing
 // TODO mouse scrolling 
 // TODO Scrollbar web component to scroll through this list
@@ -20,6 +19,7 @@ export class VirtualTable extends HTMLElement {
         this.main.id = "root"
         this.main.setAttribute("tabindex", "0")
         this.main.addEventListener("keydown", evt => this.onKeyDown(evt))
+        this.main.addEventListener("click", evt => this.onClick(evt))
         this.table = document.createElement("table")
         this.tableBody = document.createElement("tbody")
         this.table.appendChild(this.tableBody)
@@ -126,6 +126,18 @@ export class VirtualTable extends HTMLElement {
             evt.stopPropagation()
             this.checkPosition(0)
         }
+    }
+
+    onClick(evt) {
+        const index = Math.floor(evt.layerY / this.itemHeight) 
+        const elements = Array.from(this.tableBody.children) 
+        let element = elements[this.currentPosition - this.offset]
+        if (element)
+            element.classList.remove("isCurrent")
+        element = elements[index]
+        if (element)
+            element.classList.add("isCurrent")
+        this.currentPosition = index + this.offset
     }
 
     checkPosition(newPos) {
