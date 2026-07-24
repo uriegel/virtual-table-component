@@ -1,5 +1,5 @@
+// TODO ScrollIntoView when navigation key is pressed
 // TODO Resizing
-// TODO mouse scrolling 
 // TODO Scrollbar web component to scroll through this list
 // TODO Slot to render a new cell in the program with recycling
 
@@ -11,6 +11,7 @@ export class VirtualTable extends HTMLElement {
         this.currentPosition = 0
         this.offset = 0
         this.visualItemsCount = 0
+        this.items = []
     }
     
     connectedCallback() {
@@ -20,6 +21,7 @@ export class VirtualTable extends HTMLElement {
         this.main.setAttribute("tabindex", "0")
         this.main.addEventListener("keydown", evt => this.onKeyDown(evt))
         this.main.addEventListener("click", evt => this.onClick(evt))
+        this.main.addEventListener("wheel", evt => this.onWheel(evt))
         this.table = document.createElement("table")
         this.tableBody = document.createElement("tbody")
         this.table.appendChild(this.tableBody)
@@ -86,16 +88,42 @@ export class VirtualTable extends HTMLElement {
         return Math.floor(this.main.clientHeight / this.itemHeight)
     }
 
+    scroll(up) {
+        if (!up) {
+            if (this.offset + this.visualItemsCount >= this.items.length)
+                return
+            this.offset++
+            const recycled = this.tableBody.firstElementChild
+            recycled.remove()
+            if (this.offset + this.visualItemsCount == this.currentPosition)
+                recycled.classList.add("isCurrent")
+            else
+                recycled.classList.remove("isCurrent")
+            recycled.lastChild.textContent = this.items[this.offset + this.visualItemsCount]
+            this.tableBody.appendChild(recycled)
+        } else {
+            if (this.offset < 0)
+                return
+            this.offset--
+            const recycled = this.tableBody.lastElementChild
+            recycled.remove()
+            if (this.offset == this.currentPosition)
+                recycled.classList.add("isCurrent")
+            else
+                recycled.classList.remove("isCurrent")
+            recycled.firstChild.textContent = this.items[this.offset]
+            this.tableBody.insertBefore(recycled, this.tableBody.firstElementChild)
+        }
+    }
+
     onResize() {
-        if (!this.items)
+        if (this.items.length == 0)
             return
-        console.log("Resized", this.main.clientHeight, this.getVisualItems())
         const itemsCount = this.visualItemsCount
         this.visualItemsCount = this.getVisualItems()
         const elements = Array.from(this.tableBody.children) 
         var tooMuch = elements.length - this.visualItemsCount - 1
         if (tooMuch > 0) {
-            // TODO split: up to selected item remove last elements, then first elements
             for (let i = 0; i < tooMuch; i++) { 
                 const recycled = this.tableBody.lastElementChild
                 recycled.remove()
@@ -151,6 +179,15 @@ export class VirtualTable extends HTMLElement {
         if (element)
             element.classList.add("isCurrent")
         this.currentPosition = index + this.offset
+    }
+
+    onWheel(evt) {
+        const delta = evt.deltaY / Math.abs(evt.deltaY) * 3
+        if (this.items.length > this.visualItemsCount && !Number.isNaN(delta)) {
+            this.scroll(delta < 0)
+            this.scroll(delta < 0)
+            this.scroll(delta < 0)
+        }
     }
 
     checkPosition(newPos) {
