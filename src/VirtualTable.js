@@ -68,12 +68,7 @@ export class VirtualTable extends HTMLElement {
         items
             .filter((_, idx) => idx <= count)
             .forEach((item, idx) => {
-                const tr = document.createElement("tr")
-                if (idx == this.currentPosition)
-                    tr.classList.add("isCurrent")
-                const td = document.createElement("td")
-                td.textContent = item
-                tr.appendChild(td)
+                const tr = this.createItem(item, idx)
                 this.tableBody.appendChild(tr)
             })
     }
@@ -92,7 +87,25 @@ export class VirtualTable extends HTMLElement {
     }
 
     onResize() {
-        console.log("Resized", this.main.clientHeight, this.visualItemsCount)
+        if (!this.items)
+            return
+        console.log("Resized", this.main.clientHeight, this.getVisualItems())
+        const itemsCount = this.visualItemsCount
+        this.visualItemsCount = this.getVisualItems()
+        const elements = Array.from(this.tableBody.children) 
+        var tooMuch = elements.length - this.visualItemsCount - 1
+        if (tooMuch > 0) {
+            // TODO split: up to selected item remove last elements, then first elements
+            for (let i = 0; i < tooMuch; i++) { 
+                const recycled = this.tableBody.lastElementChild
+                recycled.remove()
+            }
+        } else if (tooMuch < 0) {
+            for (let i = 0; i < -tooMuch && itemsCount + i < this.items.length; i++) { 
+                const tr = this.createItem(this.items[itemsCount + i + 1 + this.offset], -1)
+                this.tableBody.appendChild(tr)
+            }
+        }
     }
 
     onKeyDown(evt) {
@@ -187,6 +200,16 @@ export class VirtualTable extends HTMLElement {
             }
         }
         return 0
+    }
+
+    createItem(item, idx) {
+        const tr = document.createElement("tr")
+        if (idx == this.currentPosition)
+            tr.classList.add("isCurrent")
+        const td = document.createElement("td")
+        td.textContent = item
+        tr.appendChild(td)
+        return tr
     }
 }
 
