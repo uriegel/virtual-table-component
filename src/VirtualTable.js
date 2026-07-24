@@ -1,4 +1,3 @@
-// TODO ScrollIntoView when navigation key is pressed
 // TODO Resizing
 // TODO Scrollbar web component to scroll through this list
 // TODO Slot to render a new cell in the program with recycling
@@ -204,7 +203,8 @@ export class VirtualTable extends HTMLElement {
     }
 
     scrollIntoView(newPos, up) {
-        if (!up) {
+
+        const scrollDown = () => {
             const offset = newPos - this.offset - this.visualItemsCount + 1
             if (offset >= 0) {
                 const elements = Array.from(this.tableBody.children) 
@@ -219,7 +219,10 @@ export class VirtualTable extends HTMLElement {
                 this.offset += offset
                 return offset
             }
-        } else {
+            return 0
+        }
+
+        const scrollUp = () => {
             const offset = newPos - this.offset
             if (offset < 0) {
                 const elements = Array.from(this.tableBody.children) 
@@ -235,9 +238,24 @@ export class VirtualTable extends HTMLElement {
                 this.offset += offset
                 return offset
             }
+            return 0
         }
+
+        if (!up) { 
+            const res = scrollDown()
+            if (res != 0)
+                return res
+        } else {
+            const res = scrollUp()
+            if (res != 0)
+                return res
+        }
+        if (!up && this.currentPosition < this.offset) 
+            return scrollUp()
+        else if (this.currentPosition > this.offset + this.visualItemsCount) 
+            return scrollDown()
         return 0
-    }
+    }    
 
     createItem(item, idx) {
         const tr = document.createElement("tr")
