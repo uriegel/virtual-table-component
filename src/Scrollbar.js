@@ -30,11 +30,6 @@ export class Scrollbar extends HTMLElement {
 
         this.appendChild(style)        
     }
-
-    setHeight(height) {
-        this.height = height
-        this.setAttribute("height", height)
-    }
 }
 
 customElements.define("scroll-bar", Scrollbar)

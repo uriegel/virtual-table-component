@@ -118,7 +118,7 @@ export class VirtualTable extends HTMLElement {
     }
 
     onResize() {
-        this.scrollbar.setHeight(this.tableBody.offsetHeight)
+        this.scrollbar.style.setProperty('height', `${this.tableBody.clientHeight}px`);
         if (this.items.length == 0)
             return
         const itemsCount = this.visualItemsCount
