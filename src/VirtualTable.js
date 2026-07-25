@@ -1,5 +1,4 @@
 import './Scrollbar.js'
-// TODO 70_000 items: Home/End very slow!!! Use Scroll to offset
 // TODO Measure: let application measure it
 // TODO items from template with icon from server and name
 // TODO columns with Headers 
@@ -155,9 +154,6 @@ export class VirtualTable extends HTMLElement {
             detail: { tr: null }
         })
         this.dispatchEvent(event)
-
-        console.log("eREZUGE EINTRAG")
-
         return event.detail.tr
     }
 
@@ -245,12 +241,16 @@ export class VirtualTable extends HTMLElement {
         else if (evt.key == "End") {
             evt.preventDefault()
             evt.stopPropagation()
-            this.checkPosition(this.items.length - 1)
+            this.offset = Math.max(this.items.length - this.visualItemsCount, 0)
+            this.currentPosition = this.items.length - 1
+            this.scrollToOffset()
         }
         else if (evt.key == "Home") {
             evt.preventDefault()
             evt.stopPropagation()
-            this.checkPosition(0)
+            this.offset = 0
+            this.currentPosition = 0
+            this.scrollToOffset()
         }
     }
 
@@ -276,7 +276,6 @@ export class VirtualTable extends HTMLElement {
     }
 
     onScrolled(evt) {
-        console.log("Scrolled", evt.detail.pos)
         const scroll = this.offset != evt.detail.pos
         this.offset = evt.detail.pos
         if (scroll)
