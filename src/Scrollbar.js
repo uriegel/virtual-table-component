@@ -122,7 +122,9 @@ export class Scrollbar extends HTMLElement {
     }
 
     setRange() {
-        return Math.max(0, this.count - this.displayCount)
+        const range = Math.max(0, this.count - this.displayCount)
+        this.style.setProperty('display', range > 0 ? '' : 'none')  
+        return range
     } 
 
     getGripHeight() {

@@ -1,6 +1,6 @@
 import './Scrollbar.js'
-// TODO Hide scrollbar when not necessary
 // TODO 70_000 items: Home/End very slow!!! Use Scroll to offset
+// TODO Measure: let application measure it
 // TODO items from template with icon from server and name
 // TODO columns with Headers 
 

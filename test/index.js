@@ -17,7 +17,7 @@ tableView.addEventListener("render-rowitem", evt => {
 })
 
 fill.onclick = () => {
-    tableView.setItems(Array.from({ length: 70_000 }, (value, index) => `Eintrag Numero: ${index}`))
+    tableView.setItems(Array.from({ length: 7 }, (value, index) => `Eintrag Numero: ${index}`))
     tableView.focus()
 }
 
