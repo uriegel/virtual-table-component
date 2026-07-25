@@ -10,6 +10,11 @@ tableView.addEventListener("create-rowitem", evt => {
     tr.appendChild(td)
     evt.detail.tr = tr
 })
+tableView.addEventListener("measure-rowitem", evt => {
+    const tr = evt.detail.tr
+    const td = tr.querySelector('#td')
+    td.textContent = 'Measuring...'
+})
 tableView.addEventListener("render-rowitem", evt => {
     const tr = evt.detail.tr
     const td = tr.querySelector('#td')

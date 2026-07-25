@@ -1,5 +1,4 @@
 import './Scrollbar.js'
-// TODO Measure: let application measure it
 // TODO items from template with icon from server and name
 // TODO columns with Headers 
 
@@ -125,10 +124,8 @@ export class VirtualTable extends HTMLElement {
             })
     }
     measure() {
-        const tr = document.createElement("tr")
-        const td = document.createElement("td")
-        td.textContent = "item"
-        tr.appendChild(td)
+        var tr = this.createRowItem()
+        this.measureRowItem(tr)
         this.tableBody.appendChild(tr)
         this.itemHeight = tr.offsetHeight
         this.visualItemsCount = this.getVisualItems()
@@ -155,6 +152,15 @@ export class VirtualTable extends HTMLElement {
         })
         this.dispatchEvent(event)
         return event.detail.tr
+    }
+
+    measureRowItem(tr) {
+        const event = new CustomEvent('measure-rowitem', {
+            bubbles: false,
+            cancelable: false,
+            detail: { tr }
+        })
+        this.dispatchEvent(event)
     }
 
     renderRowItem(tr, item) {
