@@ -1,6 +1,8 @@
 const minScrollbarGripSize = 20
 
 export class Scrollbar extends HTMLElement {
+    #scrollbarGripTop = 0
+    #scrollPosition = 0
 
     constructor() {
         super()
@@ -8,6 +10,7 @@ export class Scrollbar extends HTMLElement {
         this.displayCount = 0
         this.range = 1
         this.gripHeight = 0
+        this.scrollPosition = 0
     }
     
     connectedCallback() {
@@ -54,6 +57,18 @@ export class Scrollbar extends HTMLElement {
         this.appendChild(style)        
     }
 
+    get scrollbarGripTop() { return this.#scrollbarGripTop }
+    set scrollbarGripTop(val) {
+        this.#scrollbarGripTop = val
+        this.main?.style.setProperty('top', `${val}px`)
+    }
+
+    get scrollPosition() { return this.#scrollPosition }
+    set scrollPosition(val) {
+        this.#scrollPosition = val
+        this.scrollbarGripTop = this.getScrollbarGripTop()  
+    }
+
     setHeight(headerHeight) {
         this.style.setProperty('height', `calc(100% - ${headerHeight}px)`);
     }
@@ -62,12 +77,14 @@ export class Scrollbar extends HTMLElement {
         this.count = val
         this.range = this.setRange()
         this.gripHeight = this.getGripHeight()
+        this.scrollbarGripTop = this.getScrollbarGripTop()
     }
 
     setDisplayCount(val) {
         this.displayCount = val
         this.range = this.setRange()
         this.gripHeight = this.getGripHeight()
+        this.scrollbarGripTop = this.getScrollbarGripTop()
     }
 
     setRange() {
@@ -79,9 +96,9 @@ export class Scrollbar extends HTMLElement {
         this.main.style.setProperty('height', `${height}px`)
         return height
     }
-    // getScrollbarGripTop() {
-    //     return (this.offsetHeight - gripHeight) * (scrollPosition / this.range) 
-    // } 
+    getScrollbarGripTop() {
+        return (this.offsetHeight - this.gripHeight) * (this.scrollPosition / this.range) 
+    } 
 
 }
 

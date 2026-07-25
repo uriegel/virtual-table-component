@@ -3,12 +3,12 @@ import './Scrollbar.js'
 // TODO Slot to render a new cell in the program with recycling
 
 export class VirtualTable extends HTMLElement {
+    #offset = 0
 
     constructor() {
         super()
         this.itemHeight = 0
         this.currentPosition = 0
-        this.offset = 0
         this.visualItemsCount = 0
         this.items = []
 
@@ -41,6 +41,15 @@ export class VirtualTable extends HTMLElement {
             --vtc111-scrollbar-grip-width: calc(100% - var(--vtc-scrollbar-grip-right));
             --vtc-scrollbar-right-margin: 15px;
         }`)
+    }
+
+    set offset(val) {
+        this.#offset = val
+        this.scrollbar.scrollPosition = val
+    }
+
+    get offset() {
+        return this.#offset
     }
     
     connectedCallback() {
