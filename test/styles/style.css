@@ -27,6 +27,7 @@ body {
 }
 .icon {
     width: 16px;
+    vertical-align: bottom;
 }
 
 @media (prefers-color-scheme: dark) {
