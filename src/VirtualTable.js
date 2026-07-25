@@ -1,7 +1,5 @@
 import './Scrollbar.js'
-// TODO Scrollbar on scroll: scroll the list recycle all)
-// TODO Scrollbar on scroll: scroll the list (delta < visual items count ? recycle some items : recycle all)
-// TODO Slot to render a new cell in the program with recycling
+// TODO Slot to render a new cell in the program with recycling: use vector icon and name
 // TODO columns with Headers 
 
 export class VirtualTable extends HTMLElement {
@@ -61,7 +59,7 @@ export class VirtualTable extends HTMLElement {
         this.grip.id = "root"
         this.grip.setAttribute("tabindex", "0")
         this.grip.addEventListener("keydown", evt => this.onKeyDown(evt))
-        this.grip.addEventListener("click", evt => this.onClick(evt))
+        this.grip.addEventListener("mousedown", evt => this.onMouseDown(evt))
         this.grip.addEventListener("wheel", evt => this.onWheel(evt))
         this.table = document.createElement("table")
         this.tableBody = document.createElement("tbody")
@@ -113,7 +111,7 @@ export class VirtualTable extends HTMLElement {
 
         this.scrollbar.setCount(this.items.length)
 
-        while (this.tableBody.lastElementChild) 
+        while (this.tableBody.lastElementChild)
             this.tableBody.removeChild(this.tableBody.lastElementChild)
 
         const count = this.getVisualItems()
@@ -138,6 +136,17 @@ export class VirtualTable extends HTMLElement {
 
     getVisualItems() {
         return Math.floor(this.grip.clientHeight / this.itemHeight)
+    }
+
+    scrollToOffset() {
+        const elements = Array.from(this.tableBody.children)
+        elements.forEach((element, idx) => {
+            if (this.offset + idx == this.currentPosition)
+                element.classList.add("isCurrent")
+            else
+                element.classList.remove("isCurrent")
+            element.firstChild.textContent = this.items[this.offset + idx]            
+        })
     }
 
     scroll(up) {
@@ -224,7 +233,7 @@ export class VirtualTable extends HTMLElement {
         }
     }
 
-    onClick(evt) {
+    onMouseDown(evt) {
         const index = Math.floor(evt.layerY / this.itemHeight) 
         const elements = Array.from(this.tableBody.children) 
         let element = elements[this.currentPosition - this.offset]
@@ -247,7 +256,10 @@ export class VirtualTable extends HTMLElement {
 
     onScrolled(evt) {
         console.log("Scrolled", evt.detail.pos)
+        const scroll = this.offset != evt.detail.pos
         this.offset = evt.detail.pos
+        if (scroll)
+            this.scrollToOffset()
     }
 
     checkPosition(newPos) {
