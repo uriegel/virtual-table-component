@@ -1,5 +1,5 @@
 import './Scrollbar.js'
-// TODO Slot to render a new cell in the program with recycling: use vector icon and name
+// TODO to much elements above and below
 // TODO columns with Headers 
 
 export class VirtualTable extends HTMLElement {
@@ -55,25 +55,25 @@ export class VirtualTable extends HTMLElement {
     
     connectedCallback() {
         this.shadow = this.attachShadow({ mode: "open" })
-        this.grip = document.createElement("div")
-        this.grip.id = "root"
-        this.grip.setAttribute("tabindex", "0")
-        this.grip.addEventListener("keydown", evt => this.onKeyDown(evt))
-        this.grip.addEventListener("mousedown", evt => this.onMouseDown(evt))
-        this.grip.addEventListener("wheel", evt => this.onWheel(evt))
+        this.root = document.createElement("div")
+        this.root.id = "root"
+        this.root.setAttribute("tabindex", "0")
+        this.root.addEventListener("keydown", evt => this.onKeyDown(evt))
+        this.root.addEventListener("mousedown", evt => this.onMouseDown(evt))
+        this.root.addEventListener("wheel", evt => this.onWheel(evt))
         this.table = document.createElement("table")
         this.tableBody = document.createElement("tbody")
         this.table.appendChild(this.tableBody)
-        this.grip.appendChild(this.table)
+        this.root.appendChild(this.table)
         this.scrollbar = document.createElement("scroll-bar")
         this.scrollbar.addEventListener("scrollbar-scrolled", evt => this.onScrolled(evt))
-        this.grip.appendChild(this.scrollbar)
-        this.shadow.appendChild(this.grip)
+        this.root.appendChild(this.scrollbar)
+        this.shadow.appendChild(this.root)
         this.setAttribute("tabindex", "0")
-        this.addEventListener("focus", () => this.grip.focus())
+        this.addEventListener("focus", () => this.root.focus())
 
         const resizeObserver = new ResizeObserver(() => this.onResize())
-        resizeObserver.observe(this.grip)
+        resizeObserver.observe(this.root)
 
         const style = document.createElement('style')
         style.textContent = `
@@ -135,18 +135,34 @@ export class VirtualTable extends HTMLElement {
     }
 
     getVisualItems() {
-        return Math.floor(this.grip.clientHeight / this.itemHeight)
+        return Math.floor(this.root.clientHeight / this.itemHeight)
     }
 
     scrollToOffset() {
         const elements = Array.from(this.tableBody.children)
         elements.forEach((element, idx) => {
-            if (this.offset + idx == this.currentPosition)
-                element.classList.add("isCurrent")
-            else
-                element.classList.remove("isCurrent")
-            element.firstChild.textContent = this.items[this.offset + idx]            
+            this.checkCurrentItem(element, this.offset + idx)
+            this.renderRowItem(element, this.items[this.offset + idx])
         })
+    }
+
+    createRowItem() {
+        const event = new CustomEvent('create-rowitem', {
+            bubbles: false,
+            cancelable: false,
+            detail: { tr: null }
+        })
+        this.dispatchEvent(event)
+        return event.detail.tr
+    }
+
+    renderRowItem(tr, item) {
+        const event = new CustomEvent('render-rowitem', {
+            bubbles: false,
+            cancelable: false,
+            detail: { tr, item }
+        })
+        this.dispatchEvent(event)
     }
 
     scroll(up) {
@@ -156,11 +172,9 @@ export class VirtualTable extends HTMLElement {
             this.offset++
             const recycled = this.tableBody.firstElementChild
             recycled.remove()
-            if (this.offset + this.visualItemsCount == this.currentPosition)
-                recycled.classList.add("isCurrent")
-            else
-                recycled.classList.remove("isCurrent")
-            recycled.lastChild.textContent = this.items[this.offset + this.visualItemsCount]
+
+            this.checkCurrentItem(recycled, this.offset + this.visualItemsCount)
+            this.renderRowItem(recycled, this.items[this.offset + this.visualItemsCount])
             this.tableBody.appendChild(recycled)
         } else {
             if (this.offset < 0)
@@ -168,11 +182,8 @@ export class VirtualTable extends HTMLElement {
             this.offset--
             const recycled = this.tableBody.lastElementChild
             recycled.remove()
-            if (this.offset == this.currentPosition)
-                recycled.classList.add("isCurrent")
-            else
-                recycled.classList.remove("isCurrent")
-            recycled.firstChild.textContent = this.items[this.offset]
+            this.checkCurrentItem(recycled, this.offset)
+            this.renderRowItem(recycled, this.items[this.offset])
             this.tableBody.insertBefore(recycled, this.tableBody.firstElementChild)
         }
     }
@@ -285,7 +296,7 @@ export class VirtualTable extends HTMLElement {
                     const recycled = this.tableBody.firstElementChild
                     recycled.remove()
                     recycled.classList.remove("isCurrent")
-                    recycled.firstChild.textContent = this.items[this.offset + this.visualItemsCount + 1 + i] 
+                    this.renderRowItem(recycled, this.items[this.offset + this.visualItemsCount + 1 + i])
                     this.tableBody.appendChild(recycled)
                 }
 
@@ -304,7 +315,7 @@ export class VirtualTable extends HTMLElement {
                         const recycled = this.tableBody.lastElementChild
                         recycled.remove()
                         recycled.classList.remove("isCurrent")
-                        recycled.firstChild.textContent = this.items[this.offset - 1 - i]
+                        this.renderRowItem(recycled, this.items[this.offset - 1 - i])
                         this.tableBody.insertBefore(recycled, this.tableBody.firstElementChild)
                     }
                 }
@@ -330,13 +341,17 @@ export class VirtualTable extends HTMLElement {
         return 0
     }    
 
-    createItem(item, idx) {
-        const tr = document.createElement("tr")
+    checkCurrentItem(element, idx) {
         if (idx == this.currentPosition)
-            tr.classList.add("isCurrent")
-        const td = document.createElement("td")
-        td.textContent = item
-        tr.appendChild(td)
+            element.classList.add("isCurrent")
+        else
+            element.classList.remove("isCurrent")
+    }
+
+    createItem(item, idx) {
+        const tr = this.createRowItem()
+        this.checkCurrentItem(tr, idx)
+        this.renderRowItem(tr, item)
         return tr
     }
 }
