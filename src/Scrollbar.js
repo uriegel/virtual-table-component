@@ -70,7 +70,7 @@ export class Scrollbar extends HTMLElement {
         this.scrollbarGripTop = this.getScrollbarGripTop()  
     }
 
-    setHeight(headerHeight) {
+    setHeightOffset(headerHeight) {
         this.style.setProperty('height', `calc(100% - ${headerHeight}px)`);
     }
 

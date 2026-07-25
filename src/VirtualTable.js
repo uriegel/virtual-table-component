@@ -1,6 +1,7 @@
 import './Scrollbar.js'
 
-// TODO columns with Headers 
+// TODO set columns: remove old columns, reset scrollbar
+// TODO set items: remove old items, reset scrollbar
 // TODO css style for item row from css: call method to transfer it o the shadow dom
 
 export class VirtualTable extends HTMLElement {
@@ -63,6 +64,8 @@ export class VirtualTable extends HTMLElement {
         this.root.addEventListener("mousedown", evt => this.onMouseDown(evt))
         this.root.addEventListener("wheel", evt => this.onWheel(evt))
         this.table = document.createElement("table")
+        this.tableHead = document.createElement("thead")
+        this.table.appendChild(this.tableHead)
         this.tableBody = document.createElement("tbody")
         this.table.appendChild(this.tableBody)
         this.root.appendChild(this.table)
@@ -103,12 +106,21 @@ export class VirtualTable extends HTMLElement {
         this.shadow.appendChild(style)
     }
 
+    setColumns(columns) {
+        const tr = document.createElement("tr")
+        this.tableHead.appendChild(tr)
+        columns.forEach(item => {
+            const th = document.createElement("th")
+            th.textContent = item
+            tr.appendChild(th)
+        })      
+        this.scrollbar.setHeightOffset(tr.clientHeight)
+    }
+
     setItems(items) {
         this.items = items
-        if (this.itemHeight == 0) {
+        if (this.itemHeight == 0) 
             this.measure()
-            this.scrollbar.setHeight(0)
-        }
         this.scrollbar.setCount(this.items.length)
 
         while (this.tableBody.lastElementChild)
@@ -133,7 +145,7 @@ export class VirtualTable extends HTMLElement {
     }
 
     getVisualItems() {
-        return Math.floor(this.root.clientHeight / this.itemHeight)
+        return Math.floor((this.root.clientHeight - this.tableHead.clientHeight) / this.itemHeight)
     }
 
     scrollToOffset() {
@@ -261,7 +273,7 @@ export class VirtualTable extends HTMLElement {
     }
 
     onMouseDown(evt) {
-        const index = Math.floor(evt.layerY / this.itemHeight) 
+        const index = Math.floor((evt.layerY - this.tableHead.clientHeight) / this.itemHeight) 
         const elements = Array.from(this.tableBody.children) 
         let element = elements[this.currentPosition - this.offset]
         if (element)
