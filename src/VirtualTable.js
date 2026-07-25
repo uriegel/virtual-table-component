@@ -1,5 +1,4 @@
 import './Scrollbar.js'
-// TODO Slot to render a new cell in the program with recycling: use vector icon and name
 // TODO columns with Headers 
 
 export class VirtualTable extends HTMLElement {
@@ -55,25 +54,25 @@ export class VirtualTable extends HTMLElement {
     
     connectedCallback() {
         this.shadow = this.attachShadow({ mode: "open" })
-        this.grip = document.createElement("div")
-        this.grip.id = "root"
-        this.grip.setAttribute("tabindex", "0")
-        this.grip.addEventListener("keydown", evt => this.onKeyDown(evt))
-        this.grip.addEventListener("mousedown", evt => this.onMouseDown(evt))
-        this.grip.addEventListener("wheel", evt => this.onWheel(evt))
+        this.root = document.createElement("div")
+        this.root.id = "root"
+        this.root.setAttribute("tabindex", "0")
+        this.root.addEventListener("keydown", evt => this.onKeyDown(evt))
+        this.root.addEventListener("mousedown", evt => this.onMouseDown(evt))
+        this.root.addEventListener("wheel", evt => this.onWheel(evt))
         this.table = document.createElement("table")
         this.tableBody = document.createElement("tbody")
         this.table.appendChild(this.tableBody)
-        this.grip.appendChild(this.table)
+        this.root.appendChild(this.table)
         this.scrollbar = document.createElement("scroll-bar")
         this.scrollbar.addEventListener("scrollbar-scrolled", evt => this.onScrolled(evt))
-        this.grip.appendChild(this.scrollbar)
-        this.shadow.appendChild(this.grip)
+        this.root.appendChild(this.scrollbar)
+        this.shadow.appendChild(this.root)
         this.setAttribute("tabindex", "0")
-        this.addEventListener("focus", () => this.grip.focus())
+        this.addEventListener("focus", () => this.root.focus())
 
         const resizeObserver = new ResizeObserver(() => this.onResize())
-        resizeObserver.observe(this.grip)
+        resizeObserver.observe(this.root)
 
         const style = document.createElement('style')
         style.textContent = `
@@ -135,7 +134,7 @@ export class VirtualTable extends HTMLElement {
     }
 
     getVisualItems() {
-        return Math.floor(this.grip.clientHeight / this.itemHeight)
+        return Math.floor(this.root.clientHeight / this.itemHeight)
     }
 
     scrollToOffset() {
