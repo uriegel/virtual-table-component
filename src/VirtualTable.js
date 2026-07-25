@@ -11,6 +11,36 @@ export class VirtualTable extends HTMLElement {
         this.offset = 0
         this.visualItemsCount = 0
         this.items = []
+
+        const style = document.createElement("style")
+        document.head.appendChild(style)
+        style.sheet?.insertRule(`:root {
+            --vtc-current-color: lightgray;
+            --vtc-current-focus-color: red;
+            --vtc-font-size: 100%;
+            --vtc-selected-background-color: blue;
+            --vtc-scrollbar-width: 16px;
+
+            --vtc-scrollbar-grip-width: 4px;
+            --vtc-scrollbar-grip-radius: 999px;
+            --vtc-scrollbar-grip-color: gray;
+            --vtc-scrollbar-grip-active-color: var(--vtc-selected-background-color);
+            --vtc-scrollbar-grip-right: 1px;
+            
+            --vtc-scrollbar-border-color: gray;
+            --vtc-scrollbar-border-width: 1px;
+            --vtc-scrollbar-background-color: white;
+            --vtc-scrollbar-button-background-color: white;
+            --vtc-scrollbar-button-color: #666;
+            --vtc-scrollbar-button-hover-color: #555
+            --vtc-scrollbar-button-active-color: #444
+            --vtc-scrollbar-button-hover-background-color: rgb(209, 209, 209);
+            --vtc-scrollbar-button-active-background-color: #aaa;
+            --vtc-scrollbar-grip-color: rgb(209, 209, 209); 
+            --vtc-scrollbar-grip-hover-color: #bbb;
+            --vtc111-scrollbar-grip-width: calc(100% - var(--vtc-scrollbar-grip-right));
+            --vtc-scrollbar-right-margin: 15px;
+        }`)
     }
     
     connectedCallback() {
@@ -49,10 +79,13 @@ export class VirtualTable extends HTMLElement {
                 width: 100%;        
             }
             tr.isCurrent {
-                outline-color: red;
+                outline-color: var(--vtc-current-color);
                 outline-width: 1px;
                 outline-style: solid;
                 outline-offset: -1px;    
+            }
+            #root:focus tr.isCurrent {
+                outline-color: var(--vtc-current-focus-color);
             }`
 
         this.shadow.appendChild(style)
@@ -60,8 +93,12 @@ export class VirtualTable extends HTMLElement {
 
     setItems(items) {
         this.items = items
-        if (this.itemHeight == 0)
+        if (this.itemHeight == 0) {
             this.measure()
+            this.scrollbar.setHeight(0)
+        }
+
+        this.scrollbar.setCount(this.items.length)
 
         while (this.tableBody.lastElementChild) 
             this.tableBody.removeChild(this.tableBody.lastElementChild)
@@ -83,6 +120,7 @@ export class VirtualTable extends HTMLElement {
         this.tableBody.appendChild(tr)
         this.itemHeight = tr.offsetHeight
         this.visualItemsCount = this.getVisualItems()
+        this.scrollbar.setDisplayCount(this.visualItemsCount)
     }
 
     getVisualItems() {
@@ -118,11 +156,11 @@ export class VirtualTable extends HTMLElement {
     }
 
     onResize() {
-        this.scrollbar.style.setProperty('height', `${this.tableBody.clientHeight}px`);
         if (this.items.length == 0)
             return
         const itemsCount = this.visualItemsCount
         this.visualItemsCount = this.getVisualItems()
+        this.scrollbar.setDisplayCount(this.visualItemsCount)
         const elements = Array.from(this.tableBody.children) 
         var tooMuch = elements.length - this.visualItemsCount - 1
         if (tooMuch > 0) {
