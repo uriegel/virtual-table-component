@@ -1,4 +1,7 @@
 import './Scrollbar.js'
+// TODO Hide scrollbar when not necessary
+// TODO 70_000 items: Home/End very slow!!! Use Scroll to offset
+// TODO items from template with icon from server and name
 // TODO columns with Headers 
 
 export class VirtualTable extends HTMLElement {
@@ -140,12 +143,36 @@ export class VirtualTable extends HTMLElement {
     scrollToOffset() {
         const elements = Array.from(this.tableBody.children)
         elements.forEach((element, idx) => {
-            if (this.offset + idx == this.currentPosition)
-                element.classList.add("isCurrent")
-            else
-                element.classList.remove("isCurrent")
-            element.firstChild.textContent = this.items[this.offset + idx]            
+            this.checkCurrentItem(element, this.offset + idx)
+            this.renderRowItem(element, this.items[this.offset + idx])
         })
+    }
+
+    createRowItem() {
+        const event = new CustomEvent('create-rowitem', {
+            bubbles: false,
+            cancelable: false,
+            detail: { tr: null }
+        })
+        this.dispatchEvent(event)
+
+        console.log("eREZUGE EINTRAG")
+
+        return event.detail.tr
+    }
+
+    renderRowItem(tr, item) {
+        if (item) {
+            tr.style.setProperty('display', "")
+            const event = new CustomEvent('render-rowitem', {
+                bubbles: false,
+                cancelable: false,
+                detail: { tr, item }
+            })
+            this.dispatchEvent(event)
+        }
+        else
+            tr.style.setProperty('display', 'none')
     }
 
     scroll(up) {
@@ -155,11 +182,9 @@ export class VirtualTable extends HTMLElement {
             this.offset++
             const recycled = this.tableBody.firstElementChild
             recycled.remove()
-            if (this.offset + this.visualItemsCount == this.currentPosition)
-                recycled.classList.add("isCurrent")
-            else
-                recycled.classList.remove("isCurrent")
-            recycled.lastChild.textContent = this.items[this.offset + this.visualItemsCount]
+
+            this.checkCurrentItem(recycled, this.offset + this.visualItemsCount)
+            this.renderRowItem(recycled, this.items[this.offset + this.visualItemsCount])
             this.tableBody.appendChild(recycled)
         } else {
             if (this.offset < 0)
@@ -167,11 +192,8 @@ export class VirtualTable extends HTMLElement {
             this.offset--
             const recycled = this.tableBody.lastElementChild
             recycled.remove()
-            if (this.offset == this.currentPosition)
-                recycled.classList.add("isCurrent")
-            else
-                recycled.classList.remove("isCurrent")
-            recycled.firstChild.textContent = this.items[this.offset]
+            this.checkCurrentItem(recycled, this.offset)
+            this.renderRowItem(recycled, this.items[this.offset])
             this.tableBody.insertBefore(recycled, this.tableBody.firstElementChild)
         }
     }
@@ -284,7 +306,7 @@ export class VirtualTable extends HTMLElement {
                     const recycled = this.tableBody.firstElementChild
                     recycled.remove()
                     recycled.classList.remove("isCurrent")
-                    recycled.firstChild.textContent = this.items[this.offset + this.visualItemsCount + 1 + i] 
+                    this.renderRowItem(recycled, this.items[this.offset + this.visualItemsCount + 1 + i])
                     this.tableBody.appendChild(recycled)
                 }
 
@@ -303,7 +325,7 @@ export class VirtualTable extends HTMLElement {
                         const recycled = this.tableBody.lastElementChild
                         recycled.remove()
                         recycled.classList.remove("isCurrent")
-                        recycled.firstChild.textContent = this.items[this.offset - 1 - i]
+                        this.renderRowItem(recycled, this.items[this.offset - 1 - i])
                         this.tableBody.insertBefore(recycled, this.tableBody.firstElementChild)
                     }
                 }
@@ -329,13 +351,17 @@ export class VirtualTable extends HTMLElement {
         return 0
     }    
 
-    createItem(item, idx) {
-        const tr = document.createElement("tr")
+    checkCurrentItem(element, idx) {
         if (idx == this.currentPosition)
-            tr.classList.add("isCurrent")
-        const td = document.createElement("td")
-        td.textContent = item
-        tr.appendChild(td)
+            element.classList.add("isCurrent")
+        else
+            element.classList.remove("isCurrent")
+    }
+
+    createItem(item, idx) {
+        const tr = this.createRowItem()
+        this.checkCurrentItem(tr, idx)
+        this.renderRowItem(tr, item)
         return tr
     }
 }

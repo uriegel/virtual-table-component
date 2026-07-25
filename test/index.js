@@ -11,18 +11,13 @@ tableView.addEventListener("create-rowitem", evt => {
     evt.detail.tr = tr
 })
 tableView.addEventListener("render-rowitem", evt => {
-
-        if (!evt.detail.item)
-            alert("Hilfe)")
-
-
     const tr = evt.detail.tr
     const td = tr.querySelector('#td')
     td.textContent = `Das muss so sein: ${evt.detail.item}`
 })
 
 fill.onclick = () => {
-    tableView.setItems(Array.from({ length: 70 }, (value, index) => `Eintrag Numero: ${index}`))
+    tableView.setItems(Array.from({ length: 70_000 }, (value, index) => `Eintrag Numero: ${index}`))
     tableView.focus()
 }
 
