@@ -25,6 +25,9 @@ body {
 .hidden {
     display: none;
 }
+.icon {
+    width: 16px;
+}
 
 @media (prefers-color-scheme: dark) {
     :root {

@@ -9,4 +9,37 @@
     <PackageReference Include="WebServerLight" Version="2.5.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Resources/icon1.png">
+      <LogicalName>icon1</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources/icon2.png">
+      <LogicalName>icon2</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources/icon3.png">
+      <LogicalName>icon3</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources/icon4.png">
+      <LogicalName>icon4</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources/icon5.png">
+      <LogicalName>icon5</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources/icon6.png">
+      <LogicalName>icon6</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources/icon7.png">
+      <LogicalName>icon7</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources/icon8.png">
+      <LogicalName>icon8</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources/icon9.png">
+      <LogicalName>icon9</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources/icon10.png">
+      <LogicalName>icon0</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+
 </Project>

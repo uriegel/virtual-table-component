@@ -1,6 +1,7 @@
 import './Scrollbar.js'
-// TODO items from template with icon from server and name
+
 // TODO columns with Headers 
+// TODO css style for item row from css: call method to transfer it o the shadow dom
 
 export class VirtualTable extends HTMLElement {
     #offset = 0
@@ -108,7 +109,6 @@ export class VirtualTable extends HTMLElement {
             this.measure()
             this.scrollbar.setHeight(0)
         }
-
         this.scrollbar.setCount(this.items.length)
 
         while (this.tableBody.lastElementChild)
@@ -127,7 +127,7 @@ export class VirtualTable extends HTMLElement {
         var tr = this.createRowItem()
         this.measureRowItem(tr)
         this.tableBody.appendChild(tr)
-        this.itemHeight = tr.offsetHeight
+        this.itemHeight = tr.clientHeight
         this.visualItemsCount = this.getVisualItems()
         this.scrollbar.setDisplayCount(this.visualItemsCount)
     }
