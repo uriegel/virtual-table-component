@@ -15,9 +15,10 @@ export class Scrollbar extends HTMLElement {
     
     connectedCallback() {
         this.id = "scrollbar"
-        this.main = document.createElement("div")
-        this.main.id = "grip"
-        this.appendChild(this.main)
+        this.grip = document.createElement("div")
+        this.grip.id = "grip"
+        this.grip.addEventListener("mousedown", evt => this.onGripMouseDown(evt))
+        this.appendChild(this.grip)
 
         const style = document.createElement('style')
         style.textContent = `
@@ -60,7 +61,7 @@ export class Scrollbar extends HTMLElement {
     get scrollbarGripTop() { return this.#scrollbarGripTop }
     set scrollbarGripTop(val) {
         this.#scrollbarGripTop = val
-        this.main?.style.setProperty('top', `${val}px`)
+        this.grip?.style.setProperty('top', `${val}px`)
     }
 
     get scrollPosition() { return this.#scrollPosition }
@@ -71,6 +72,39 @@ export class Scrollbar extends HTMLElement {
 
     setHeight(headerHeight) {
         this.style.setProperty('height', `calc(100% - ${headerHeight}px)`);
+    }
+
+    onGripMouseDown(evt) {
+        const pixelRange = this.offsetHeight - this.gripHeight + 1
+        const maxPosition = this.count - this.displayCount
+        const startPos = evt.y - this.scrollbarGripTop
+
+        const onmove = (evt) => {
+            const delta = evt.y - startPos
+            if (pixelRange) {
+                const factor = Math.min(1, (Math.max(0, delta * 1.0 / pixelRange)))
+                this.emitScrollPosition(Math.floor(factor * maxPosition))
+            }
+			evt.preventDefault()
+			evt.stopPropagation()
+		}
+		const onup = () => {
+			window.removeEventListener('mousemove', onmove, true)
+			window.removeEventListener('mouseup', onup, true)
+		}
+		window.addEventListener('mousemove', onmove, true)
+		window.addEventListener('mouseup', onup, true)
+
+		evt.stopPropagation()        
+    }
+
+    emitScrollPosition(pos) {
+        const event = new CustomEvent('scrollbar-scrolled', {
+            bubbles: false,
+            cancelable: false,
+            detail: { pos: pos }
+        })
+        this.dispatchEvent(event)
     }
 
     setCount(val) {
@@ -93,7 +127,7 @@ export class Scrollbar extends HTMLElement {
 
     getGripHeight() {
         const height = Math.max(this.offsetHeight * (this.displayCount / this.count || 1), minScrollbarGripSize)
-        this.main.style.setProperty('height', `${height}px`)
+        this.grip.style.setProperty('height', `${height}px`)
         return height
     }
     getScrollbarGripTop() {

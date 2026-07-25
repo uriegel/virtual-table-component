@@ -1,6 +1,8 @@
 import './Scrollbar.js'
-// TODO Scrollbar web component to scroll through this list
+// TODO Scrollbar on scroll: scroll the list recycle all)
+// TODO Scrollbar on scroll: scroll the list (delta < visual items count ? recycle some items : recycle all)
 // TODO Slot to render a new cell in the program with recycling
+// TODO columns with Headers 
 
 export class VirtualTable extends HTMLElement {
     #offset = 0
@@ -44,8 +46,9 @@ export class VirtualTable extends HTMLElement {
     }
 
     set offset(val) {
+        if (this.#offset != val)
+            this.scrollbar.scrollPosition = val
         this.#offset = val
-        this.scrollbar.scrollPosition = val
     }
 
     get offset() {
@@ -54,24 +57,25 @@ export class VirtualTable extends HTMLElement {
     
     connectedCallback() {
         this.shadow = this.attachShadow({ mode: "open" })
-        this.main = document.createElement("div")
-        this.main.id = "root"
-        this.main.setAttribute("tabindex", "0")
-        this.main.addEventListener("keydown", evt => this.onKeyDown(evt))
-        this.main.addEventListener("click", evt => this.onClick(evt))
-        this.main.addEventListener("wheel", evt => this.onWheel(evt))
+        this.grip = document.createElement("div")
+        this.grip.id = "root"
+        this.grip.setAttribute("tabindex", "0")
+        this.grip.addEventListener("keydown", evt => this.onKeyDown(evt))
+        this.grip.addEventListener("click", evt => this.onClick(evt))
+        this.grip.addEventListener("wheel", evt => this.onWheel(evt))
         this.table = document.createElement("table")
         this.tableBody = document.createElement("tbody")
         this.table.appendChild(this.tableBody)
-        this.main.appendChild(this.table)
+        this.grip.appendChild(this.table)
         this.scrollbar = document.createElement("scroll-bar")
-        this.main.appendChild(this.scrollbar)
-        this.shadow.appendChild(this.main)
+        this.scrollbar.addEventListener("scrollbar-scrolled", evt => this.onScrolled(evt))
+        this.grip.appendChild(this.scrollbar)
+        this.shadow.appendChild(this.grip)
         this.setAttribute("tabindex", "0")
-        this.addEventListener("focus", () => this.main.focus())
+        this.addEventListener("focus", () => this.grip.focus())
 
         const resizeObserver = new ResizeObserver(() => this.onResize())
-        resizeObserver.observe(this.main)
+        resizeObserver.observe(this.grip)
 
         const style = document.createElement('style')
         style.textContent = `
@@ -133,7 +137,7 @@ export class VirtualTable extends HTMLElement {
     }
 
     getVisualItems() {
-        return Math.floor(this.main.clientHeight / this.itemHeight)
+        return Math.floor(this.grip.clientHeight / this.itemHeight)
     }
 
     scroll(up) {
@@ -239,6 +243,11 @@ export class VirtualTable extends HTMLElement {
             this.scroll(delta < 0)
             this.scroll(delta < 0)
         }
+    }
+
+    onScrolled(evt) {
+        console.log("Scrolled", evt.detail.pos)
+        this.offset = evt.detail.pos
     }
 
     checkPosition(newPos) {
