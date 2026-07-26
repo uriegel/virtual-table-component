@@ -3,6 +3,9 @@ import './Scrollbar.js'
 // TODO set columns: remove old columns, reset scrollbar
 // TODO set items: remove old items, reset scrollbar
 // TODO css style for item row from css: call method to transfer it o the shadow dom
+// TODO scrollbar hidden: transition
+// TODO scrollbar active transition
+
 
 export class VirtualTable extends HTMLElement {
     #offset = 0
@@ -21,7 +24,7 @@ export class VirtualTable extends HTMLElement {
             --vtc-current-focus-color: red;
             --vtc-font-size: 100%;
             --vtc-selected-background-color: blue;
-            --vtc-scrollbar-width: 16px;
+            --vtc-scrollbar-width: 12px;
 
             --vtc-scrollbar-grip-width: 4px;
             --vtc-scrollbar-grip-radius: 999px;
@@ -40,8 +43,11 @@ export class VirtualTable extends HTMLElement {
             --vtc-scrollbar-button-active-background-color: #aaa;
             --vtc-scrollbar-grip-color: rgb(209, 209, 209); 
             --vtc-scrollbar-grip-hover-color: #bbb;
-            --vtc111-scrollbar-grip-width: calc(100% - var(--vtc-scrollbar-grip-right));
             --vtc-scrollbar-right-margin: 15px;
+            --vtc-caption-color: white;
+            --vtc-caption-background-color: gray;
+            --vtc-caption-background-hover-color: #0063ff;
+            --vtc-caption-separator-color: white;
         }`)
     }
 
@@ -93,10 +99,23 @@ export class VirtualTable extends HTMLElement {
                 table-layout: fixed;
                 width: 100%;        
             }
-            tr>td {
+            td {
+                padding-left: 6px;
                 text-overflow: ellipsis;
                 overflow: hidden;
                 white-space: nowrap;
+                -webkit-user-select: none;
+                user-select: none;
+                transition: padding-right .4s;
+            }
+            td:first-child {
+                padding-left: 1px;
+            }
+            th.rightAligned {
+                text-align: right;
+            }
+            td.rightAligned {
+                text-align: right;
             }
             tr.isCurrent {
                 outline-color: var(--vtc-current-color);
@@ -104,6 +123,30 @@ export class VirtualTable extends HTMLElement {
                 outline-style: solid;
                 outline-offset: -1px;    
             }
+            .scrollbarActive tr td:last-child {
+                padding-right: calc(3px + var(--vtc-scrollbar-right-margin));
+            }                
+            thead {
+                color: var(--vtr-caption-color);
+                background-color: var(--vtc-caption-background-color);
+            }
+            th {
+                text-overflow: ellipsis;
+                -webkit-user-select: none;
+                user-select: none;
+                text-align: left;
+                font-weight: normal;
+                border-left-style: solid;
+                border-left-width: 1px;
+                border-left-color: var(--vtc-caption-separator-color);
+                padding-left: 5px;
+                padding-right: 5px;
+                overflow: hidden;
+                white-space: nowrap;
+            }
+            th:first-child {
+                border-left-width: 0px;
+            }                  
             #root:focus tr.isCurrent {
                 outline-color: var(--vtc-current-focus-color);
             }`
