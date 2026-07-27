@@ -1,5 +1,6 @@
 import './Scrollbar.js'
 
+// TODO Header style dark/light default
 // TODO set columns: remove old columns, reset scrollbar
 // TODO set columns: sorting items by sort function
 // TODO set items: remove old items, reset scrollbar
