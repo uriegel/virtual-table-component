@@ -66,7 +66,7 @@ export class VirtualTable extends HTMLElement {
     get offset() {
         return this.#offset
     }
-    
+
     connectedCallback() {
         this.shadow = this.attachShadow({ mode: "open" })
         this.root = document.createElement("div")
@@ -78,6 +78,8 @@ export class VirtualTable extends HTMLElement {
         this.root.addEventListener("wheel", evt => this.onWheel(evt))
         this.table = document.createElement("table")
         this.tableHead = document.createElement("thead")
+        this.tableHeadRow = document.createElement("tr")
+        this.tableHead.appendChild(this.tableHeadRow)
         this.table.appendChild(this.tableHead)
         this.tableBody = document.createElement("tbody")
         this.table.appendChild(this.tableBody)
@@ -162,19 +164,21 @@ export class VirtualTable extends HTMLElement {
     }
 
     setColumns(columns) {
-        const tr = document.createElement("tr")
-        this.tableHead.appendChild(tr)
+        while (this.tableHeadRow.lastElementChild)
+            this.tableHeadRow.removeChild(this.tableHeadRow.lastElementChild)
         columns.forEach(item => {
             const th = document.createElement("th")
             th.textContent = item
-            tr.appendChild(th)
-        })      
-        this.scrollbar.setHeightOffset(tr.clientHeight)
+            this.tableHeadRow.appendChild(th)
+        })
+        this.scrollbar.setHeightOffset(this.tableHeadRow.clientHeight)
     }
 
-    setItems(items) {
+    setItems(items, pos) {
+        this.currentPosition = 0
+        this.offset = 0
         this.items = items
-        if (this.itemHeight == 0) 
+        if (this.itemHeight == 0)
             this.measure()
         this.scrollbar.setCount(this.items.length)
 
@@ -189,6 +193,8 @@ export class VirtualTable extends HTMLElement {
                 const tr = this.createItem(item, idx)
                 this.tableBody.appendChild(tr)
             })
+        if (pos || pos > 0)
+            this.checkPosition(pos)
     }
     measure() {
         var tr = this.createRowItem()
@@ -273,15 +279,15 @@ export class VirtualTable extends HTMLElement {
         const itemsCount = this.visualItemsCount
         this.visualItemsCount = this.getVisualItems()
         this.scrollbar.setDisplayCount(this.visualItemsCount)
-        const elements = Array.from(this.tableBody.children) 
+        const elements = Array.from(this.tableBody.children)
         var tooMuch = elements.length - this.visualItemsCount - 1
         if (tooMuch > 0) {
-            for (let i = 0; i < tooMuch; i++) { 
+            for (let i = 0; i < tooMuch; i++) {
                 const recycled = this.tableBody.lastElementChild
                 recycled.remove()
             }
         } else if (tooMuch < 0) {
-            for (let i = 0; i < -tooMuch && itemsCount + i < this.items.length; i++) { 
+            for (let i = 0; i < -tooMuch && itemsCount + i < this.items.length; i++) {
                 const tr = this.createItem(this.items[itemsCount + i + 1 + this.offset], -1)
                 this.tableBody.appendChild(tr)
             }
@@ -333,8 +339,8 @@ export class VirtualTable extends HTMLElement {
     }
 
     onMouseDown(evt) {
-        const index = Math.floor((evt.layerY - this.tableHead.clientHeight) / this.itemHeight) 
-        const elements = Array.from(this.tableBody.children) 
+        const index = Math.floor((evt.layerY - this.tableHead.clientHeight) / this.itemHeight)
+        const elements = Array.from(this.tableBody.children)
         let element = elements[this.currentPosition - this.offset]
         if (element)
             element.classList.remove("isCurrent")
@@ -372,8 +378,8 @@ export class VirtualTable extends HTMLElement {
     checkPosition(newPos) {
         const up = newPos < this.currentPosition
         newPos = up ? Math.max(newPos, 0) : Math.min(newPos, this.items.length - 1)
-        const delta =this.scrollIntoView(newPos, up)
-        const elements = Array.from(this.tableBody.children) 
+        const delta = this.scrollIntoView(newPos, up)
+        const elements = Array.from(this.tableBody.children)
         const element = elements[this.currentPosition - this.offset]
         if (element)
             element.classList.remove("isCurrent")
@@ -387,8 +393,8 @@ export class VirtualTable extends HTMLElement {
         const scrollDown = () => {
             const offset = newPos - this.offset - this.visualItemsCount + 1
             if (offset >= 0) {
-                const elements = Array.from(this.tableBody.children) 
-                for (let i = 0; i < offset; i++) { 
+                const elements = Array.from(this.tableBody.children)
+                for (let i = 0; i < offset; i++) {
                     const recycled = this.tableBody.firstElementChild
                     recycled.remove()
                     recycled.classList.remove("isCurrent")
@@ -405,7 +411,7 @@ export class VirtualTable extends HTMLElement {
         const scrollUp = () => {
             const offset = newPos - this.offset
             if (offset < 0) {
-                const elements = Array.from(this.tableBody.children) 
+                const elements = Array.from(this.tableBody.children)
                 if (newPos >= 0) {
                     for (let i = 0; i < -offset; i++) {
                         const recycled = this.tableBody.lastElementChild
@@ -421,7 +427,7 @@ export class VirtualTable extends HTMLElement {
             return 0
         }
 
-        if (!up) { 
+        if (!up) {
             const res = scrollDown()
             if (res != 0)
                 return res
@@ -430,12 +436,12 @@ export class VirtualTable extends HTMLElement {
             if (res != 0)
                 return res
         }
-        if (!up && this.currentPosition < this.offset) 
+        if (!up && this.currentPosition < this.offset)
             return scrollUp()
-        else if (this.currentPosition > this.offset + this.visualItemsCount) 
+        else if (this.currentPosition > this.offset + this.visualItemsCount)
             return scrollDown()
         return 0
-    }    
+    }
 
     checkCurrentItem(element, idx) {
         if (idx == this.currentPosition)
