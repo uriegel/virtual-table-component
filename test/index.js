@@ -39,4 +39,8 @@ fill.onclick = () => {
     tableView.focus()
 }
 
+tableView.addEventListener("process-selected", evt => {
+    console.log("Process", evt.detail.pos)
+})
+
 tableView.focus()
