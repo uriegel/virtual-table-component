@@ -9,6 +9,27 @@ tableView.setColumns([
     "Size"
 ])
 
+
+
+// TODO TEst
+
+function onKeyDown(evt) {
+    if (evt.key == "Tab") {
+        evt.preventDefault()
+        evt.stopPropagation()
+        console.log("Change tab)")
+    }
+}
+
+document.addEventListener("keydown", evt => onKeyDown(evt))
+document.addEventListener("focusin", evt => {
+    console.log("gib ihn weiter")
+    tableView.focus()
+})
+// TODO TEst
+
+
+
 tableView.addEventListener("create-rowitem", evt => {
     const template = document.getElementById('item')
     const tr = template.content.cloneNode(true).firstElementChild
