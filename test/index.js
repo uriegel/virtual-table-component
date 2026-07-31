@@ -1,6 +1,7 @@
 import '../src/index.js'
 
 const tableView = document.getElementById("virtual-table") 
+tableView.setStylesheet("styles/tableview.css")
 const fill = document.getElementById("fill")
 
 tableView.setColumns([
@@ -17,7 +18,6 @@ tableView.addEventListener("create-rowitem", evt => {
 tableView.addEventListener("measure-rowitem", evt => {
     const tr = evt.detail.tr
     const img = tr.querySelector('#img')
-    img.src = "image/icon5"
     const sp = tr.querySelector('#text')
     sp.textContent = 'Measuring...'
 })

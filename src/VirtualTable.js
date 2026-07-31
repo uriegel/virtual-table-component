@@ -211,6 +211,20 @@ export class VirtualTable extends HTMLElement {
         this.currentPosition = newPos
     }
 
+    getPosition() {
+        return this.currentPosition
+    }
+
+    async setStylesheet(cssUrl) {
+        const res = await fetch(cssUrl)
+        const cssText = await res.text()
+        // Create style element
+        const style = document.createElement('style')
+        style.textContent = cssText
+        // Append style to shadow root
+        this.shadow.append(style)
+    }
+
     measure() {
         var tr = this.createRowItem()
         this.measureRowItem(tr)
@@ -354,7 +368,9 @@ export class VirtualTable extends HTMLElement {
     }
 
     onMouseDown(evt) {
-        const index = Math.floor((evt.layerY - this.tableHead.clientHeight) / this.itemHeight)
+        const rect = this.table.getBoundingClientRect()
+        const y = evt.clientY - rect.top
+        const index = Math.floor((y - this.tableHead.clientHeight) / this.itemHeight)
         const elements = Array.from(this.tableBody.children)
         let element = elements[this.currentPosition - this.offset]
         if (element)
