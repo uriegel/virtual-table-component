@@ -1,12 +1,12 @@
 import './Scrollbar.js'
 
-// TODO Columns: right aligned
 // TODO Columns: adapt cols
 // TODO columns: sorting items by sort function
 // TODO columns: custom rendering for sub sorting
 
 // TODO scrollbar hidden: transition
 // TODO scrollbar active transition
+// TODO scrollbar active margin right 
 
 
 export class VirtualTable extends HTMLElement {
@@ -18,6 +18,7 @@ export class VirtualTable extends HTMLElement {
         this.currentPosition = 0
         this.visualItemsCount = 0
         this.items = []
+        this.columns = []
 
         const style = document.createElement("style")
         document.head.appendChild(style)
@@ -126,6 +127,7 @@ export class VirtualTable extends HTMLElement {
             }
             td.rightAligned {
                 text-align: right;
+                padding-right: 5px;
             }
             tr.isCurrent {
                 outline-color: var(--vtc-current-color);
@@ -165,11 +167,16 @@ export class VirtualTable extends HTMLElement {
     }
 
     setColumns(columns) {
+        this.columns = columns
         while (this.tableHeadRow.lastElementChild)
             this.tableHeadRow.removeChild(this.tableHeadRow.lastElementChild)
         columns.forEach(item => {
             const th = document.createElement("th")
-            th.textContent = item
+            th.textContent = item.text
+            if (item.isRightAligned)
+                th.classList.add("rightAligned")
+            else
+                th.classList.remove("rightAligned")
             this.tableHeadRow.appendChild(th)
         })
         this.scrollbar.setHeightOffset(this.tableHeadRow.clientHeight)
@@ -272,6 +279,13 @@ export class VirtualTable extends HTMLElement {
                 detail: { tr, item }
             })
             this.dispatchEvent(event)
+            const tds = Array.from(tr.children)
+            tds.forEach((td, idx) => {
+                if (this.columns[idx].isRightAligned)
+                    td.classList.add("rightAligned")
+                else
+                    td.classList.remove("rightAligned")
+            })
         }
         else
             tr.style.setProperty('display', 'none')

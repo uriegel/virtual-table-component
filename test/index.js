@@ -5,9 +5,9 @@ tableView.setStylesheet("styles/tableview.css")
 const fill = document.getElementById("fill")
 
 tableView.setColumns([
-    "Name", 
-    "Date",
-    "Size"
+    { text: "Name" }, 
+    { text: "Date" }, 
+    { text: "Size", isRightAligned: true }, 
 ])
 
 tableView.addEventListener("create-rowitem", evt => {
