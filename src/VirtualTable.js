@@ -1,11 +1,9 @@
 import './Scrollbar.js'
 
-// TODO GetPosition
 // TODO Columns: right aligned
 // TODO Columns: adapt cols
 // TODO columns: sorting items by sort function
 // TODO columns: custom rendering for sub sorting
-// TODO css style for item row from css: call method to transfer it to the shadow dom
 
 // TODO scrollbar hidden: transition
 // TODO scrollbar active transition
