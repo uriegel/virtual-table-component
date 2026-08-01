@@ -162,9 +162,13 @@ export class VirtualTable extends HTMLElement {
                 border-left-width: 0px;
             }
             th.sortable, th.sortable span {
+                background-color: transparent;
                 transition: background-color 0.3s;
             }
-            th.sortable:hover, th.sortable span:hover {
+            th.sortable:hover:not(:has(span:hover))  {
+                background-color: var(--vtc-caption-background-hover-color);
+            }
+            th.sortable span:hover {
                 background-color: var(--vtc-caption-background-hover-color);
             }
             .sortAscending .sortable:before, .sortAscending.sortable:before {
@@ -324,7 +328,7 @@ export class VirtualTable extends HTMLElement {
             this.renderRowItem(recycled, this.items[this.offset + this.visualItemsCount])
             this.tableBody.appendChild(recycled)
         } else {
-            if (this.offset < 0)
+            if (this.offset <= 0)
                 return
             this.offset--
             const recycled = this.tableBody.lastElementChild

@@ -3,7 +3,7 @@ export class ColumnsHeader {
         this.tableHeadRow = tableHeadRow
         this.tableHeadRow.addEventListener("mousemove", evt => this.onMouseMove(evt))
         this.tableHeadRow.addEventListener("mousedown", evt => this.onMouseDown(evt))
-        this.columnsCount = 0
+        this.sortIndex = -1
     }
 
     setColumns(columns) {
@@ -19,8 +19,6 @@ export class ColumnsHeader {
                 const col = document.createElement("span") 
                 col.textContent = item.text
                 col.classList.add("subColumnName")
-                if (item.sort)
-                    col.classList.add("sortable")
                 div.appendChild(col)
                 const subcol = document.createElement("span") 
                 subcol.textContent = item.subColumn
@@ -28,13 +26,13 @@ export class ColumnsHeader {
                 th.appendChild(div)
             } else {
                 th.textContent = item.text
-                if (item.sort)
-                    th.classList.add("sortable")
             }
             if (item.isRightAligned)
                 th.classList.add("rightAligned")
             else
                 th.classList.remove("rightAligned")
+            if (item.sort)
+                th.classList.add("sortable")
             this.tableHeadRow.appendChild(th)
         })
     }
@@ -147,10 +145,16 @@ export class ColumnsHeader {
             return
         if (this.columns[idx].sort) {
             const ths = Array.from(this.tableHeadRow.children)
-            ths.forEach(th => th.classList.remove(this.sortDescending ? "sortDescending" : "sortAscending"))
+            if (this.sortIndex != -1)
+                ths[this.sortIndex].classList.remove(this.sortDescending ? "sortDescending" : "sortAscending")
             this.sortDescending = !this.sortDescending
-            ths[idx].classList.add(this.sortDescending ? "sortDescending" : "sortAscending")
+            if (!this.columns[idx].subColumn)
+                ths[idx].classList.add(this.sortDescending ? "sortDescending" : "sortAscending")
+            else {
+                ths[idx].firstChild.classList.add(this.sortDescending ? "sortDescending" : "sortAscending")
+            }
             this.columns[idx].sort()
+            this.sortIndex = idx
         }
     }
 }
