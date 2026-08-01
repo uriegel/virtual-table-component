@@ -23,7 +23,7 @@ tableView.addEventListener("measure-rowitem", evt => {
 })
 tableView.addEventListener("render-rowitem", evt => {
     const tr = evt.detail.tr
-    if (evt.detail.item == "Item with index: 10")
+    if (evt.detail.item.index == 10)
         tr.classList.add("hidden") 
     else
         tr.classList.remove("hidden") 
