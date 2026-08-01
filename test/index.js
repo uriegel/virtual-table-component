@@ -23,6 +23,10 @@ tableView.addEventListener("measure-rowitem", evt => {
 })
 tableView.addEventListener("render-rowitem", evt => {
     const tr = evt.detail.tr
+    if (evt.detail.item == "Item with index: 10")
+        tr.classList.add("hidden") 
+    else
+        tr.classList.remove("hidden") 
     const number = evt.detail.item.slice(-1)
     const img = tr.querySelector('#img')
     img.src = `image/icon${number}`
@@ -35,7 +39,7 @@ tableView.addEventListener("render-rowitem", evt => {
 })
 
 fill.onclick = () => {
-    tableView.setItems(Array.from({ length: 70_000 }, (value, index) => `Eintrag Numero: ${index}`))
+    tableView.setItems(Array.from({ length: 70_000 }, (value, index) => `Item with index: ${index}`))
     tableView.focus()
 }
 
