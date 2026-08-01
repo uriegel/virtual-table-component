@@ -13,13 +13,28 @@ export class ColumnsHeader {
         columns.forEach((item, idx) => {
             const th = document.createElement("th")
             th.onclick = () => this.onColumnClick(idx)
-            th.textContent = item.text
+            if (item.subColumn) {
+                const div = document.createElement("div") 
+                div.classList.add("subColumns")
+                const col = document.createElement("span") 
+                col.textContent = item.text
+                col.classList.add("subColumnName")
+                if (item.sort)
+                    col.classList.add("sortable")
+                div.appendChild(col)
+                const subcol = document.createElement("span") 
+                subcol.textContent = item.subColumn
+                div.appendChild(subcol)
+                th.appendChild(div)
+            } else {
+                th.textContent = item.text
+                if (item.sort)
+                    th.classList.add("sortable")
+            }
             if (item.isRightAligned)
                 th.classList.add("rightAligned")
             else
                 th.classList.remove("rightAligned")
-            if (item.sort)
-                th.classList.add("sortable")
             this.tableHeadRow.appendChild(th)
         })
     }

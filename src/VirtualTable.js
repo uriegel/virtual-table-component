@@ -167,7 +167,7 @@ export class VirtualTable extends HTMLElement {
             th.sortable:hover, th.sortable span:hover {
                 background-color: var(--vtc-caption-background-hover-color);
             }
-            .sortable .sortAscending:before, .sortAscending.sortable:before {
+            .sortAscending .sortable:before, .sortAscending.sortable:before {
                 position: relative;
                 bottom: 11px;
                 border-left: 4px solid transparent;
@@ -176,7 +176,7 @@ export class VirtualTable extends HTMLElement {
                 content: '';
                 margin-right: 5px;
             }
-            .sortable .sortDescending:before, .sortDescending.sortable:before {
+            .sortDescending .sortable:before, .sortDescending.sortable:before {
                 position: relative;
                 top: 10px;
                 border-left: 4px solid transparent;
@@ -184,6 +184,12 @@ export class VirtualTable extends HTMLElement {
                 border-top: 6px solid var(--vtc-caption-color);
                 content: '';
                 margin-right: 5px;
+            }
+            th .subColumns {
+                display: flex;
+            }
+            th .subColumnName {
+                flex-grow: 1;
             }
             #root:focus tr.isCurrent {
                 outline-color: var(--vtc-current-focus-color);

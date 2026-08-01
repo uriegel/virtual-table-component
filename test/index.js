@@ -5,7 +5,7 @@ tableView.setStylesheet("styles/tableview.css")
 const fill = document.getElementById("fill")
 
 tableView.setColumns([
-    { text: "Name", sort: onTextSort }, 
+    { text: "Name", sort: onTextSort, subColumn: "Type" }, 
     { text: "Date" }, 
     { text: "Size", isRightAligned: true, sort: onSizeSort }, 
 ])
