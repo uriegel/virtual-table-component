@@ -6,7 +6,25 @@ export class ColumnsHeader {
         this.columnsCount = 0
     }
 
-    setColumnCount(count) { this.columnsCount = count }
+    setColumns(columns) {
+        this.columns = columns
+        while (this.tableHeadRow.lastElementChild)
+            this.tableHeadRow.removeChild(this.tableHeadRow.lastElementChild)
+        columns.forEach((item, idx) => {
+            const th = document.createElement("th")
+            th.onclick = () => this.onColumnClick(idx)
+            th.textContent = item.text
+            if (item.isRightAligned)
+                th.classList.add("rightAligned")
+            else
+                th.classList.remove("rightAligned")
+            if (item.sort)
+                th.classList.add("sortable")
+            this.tableHeadRow.appendChild(th)
+        })
+    }
+
+    isRightAligned(idx) { return this.columns[idx].isRightAligned }
 
     onMouseMove(evt) {
         const element = evt.target.tagName == "TH" ? evt.target : evt.target.parentElement?.parentElement
@@ -60,11 +78,11 @@ export class ColumnsHeader {
                 const firstWidth = 
                     column.style.width
                     ? parseFloat(column.style.width.substring(0, column.style.width.length - 1))
-                    : 100 / this.columnsCount
+                    : 100 / this.columns.length
                 const secondWidth = 
                     nextColumn.style.width
                     ? parseFloat(nextColumn.style.width.substring(0, nextColumn.style.width.length - 1))
-                    : 100 / this.columnsCount
+                    : 100 / this.columns.length
                 return firstWidth + secondWidth
             }                        
 
@@ -83,10 +101,10 @@ export class ColumnsHeader {
 
         const onup = (evt) => {
             
-            const preventClickOnResetting = () => setTimeout(() => dragging.current = false)
+            const preventClickOnResetting = () => setTimeout(() => this.dragging = false)
             
             const getWidths = () => {
-                const ths = Array.from(targetColumn.parentElement.children)
+                const ths = Array.from(this.tableHeadRow.children)
                 return ths.map(th => 
                     th.style.width 
                         ? parseFloat(th.style.width.substring(0, th.style.width.length - 1))
@@ -107,5 +125,17 @@ export class ColumnsHeader {
         window.addEventListener('mouseup', onup)
         evt.preventDefault()
         evt.stopPropagation()
+    }
+
+    onColumnClick(idx) {
+        if (this.dragging)
+            return
+        if (this.columns[idx].sort) {
+            const ths = Array.from(this.tableHeadRow.children)
+            ths.forEach(th => th.classList.remove(this.sortDescending ? "sortDescending" : "sortAscending"))
+            this.sortDescending = !this.sortDescending
+            ths[idx].classList.add(this.sortDescending ? "sortDescending" : "sortAscending")
+            this.columns[idx].sort()
+        }
     }
 }

@@ -6,8 +6,10 @@ import { ColumnsHeader } from "./ColumnsHeader.js"
 
 // TODO scrollbar hidden: transition
 // TODO scrollbar active transition
-// TODO scrollbar active margin right 
-// TODO Columns: initial column widths
+// TODO scrollbar active margin right transition
+// TODO Columns: initial column widths (always set to prevent jumps when adapting columns frist time)
+// TODO Styling with color filters
+// TODO Styling columns
 
 export class VirtualTable extends HTMLElement {
     #offset = 0
@@ -18,7 +20,6 @@ export class VirtualTable extends HTMLElement {
         this.currentPosition = 0
         this.visualItemsCount = 0
         this.items = []
-        this.columns = []
 
         const style = document.createElement("style")
         document.head.appendChild(style)
@@ -47,9 +48,9 @@ export class VirtualTable extends HTMLElement {
             --vtc-scrollbar-grip-color: rgb(209, 209, 209); 
             --vtc-scrollbar-grip-hover-color: #bbb;
             --vtc-scrollbar-right-margin: 15px;
-            --vtc-caption-color: white;
+            --vtc-caption-color: gray;
             --vtc-caption-background-color: #efefef;
-            --vtc-caption-background-hover-color: #0063ff;
+            --vtc-caption-background-hover-color: lightgray;
             --vtc-caption-separator-color: white;
         }
         @media (prefers-color-scheme: dark) {
@@ -159,7 +160,31 @@ export class VirtualTable extends HTMLElement {
             }
             th:first-child {
                 border-left-width: 0px;
-            }                  
+            }
+            th.sortable, th.sortable span {
+                transition: background-color 0.3s;
+            }
+            th.sortable:hover, th.sortable span:hover {
+                background-color: var(--vtc-caption-background-hover-color);
+            }
+            .sortable .sortAscending:before, .sortAscending.sortable:before {
+                position: relative;
+                bottom: 11px;
+                border-left: 4px solid transparent;
+                border-right: 4px solid transparent;
+                border-bottom: 6px solid var(--vtc-caption-color);
+                content: '';
+                margin-right: 5px;
+            }
+            .sortable .sortDescending:before, .sortDescending.sortable:before {
+                position: relative;
+                top: 10px;
+                border-left: 4px solid transparent;
+                border-right: 4px solid transparent;
+                border-top: 6px solid var(--vtc-caption-color);
+                content: '';
+                margin-right: 5px;
+            }
             #root:focus tr.isCurrent {
                 outline-color: var(--vtc-current-focus-color);
             }`
@@ -168,19 +193,7 @@ export class VirtualTable extends HTMLElement {
     }
 
     setColumns(columns) {
-        this.columns = columns
-        this.columnsHeader.setColumnCount(columns.length)
-        while (this.tableHeadRow.lastElementChild)
-            this.tableHeadRow.removeChild(this.tableHeadRow.lastElementChild)
-        columns.forEach(item => {
-            const th = document.createElement("th")
-            th.textContent = item.text
-            if (item.isRightAligned)
-                th.classList.add("rightAligned")
-            else
-                th.classList.remove("rightAligned")
-            this.tableHeadRow.appendChild(th)
-        })
+        this.columnsHeader.setColumns(columns)
         this.scrollbar.setHeightOffset(this.tableHeadRow.clientHeight)
     }
 
@@ -283,7 +296,7 @@ export class VirtualTable extends HTMLElement {
             this.dispatchEvent(event)
             const tds = Array.from(tr.children)
             tds.forEach((td, idx) => {
-                if (this.columns[idx].isRightAligned)
+                if (this.columnsHeader.isRightAligned(idx))
                     td.classList.add("rightAligned")
                 else
                     td.classList.remove("rightAligned")
