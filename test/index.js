@@ -51,8 +51,8 @@ tableView.addEventListener("process-selected", evt => {
     console.log("Process", evt.detail.pos)
 })
 
-function onTextSort() {
-    console.log("On text sort")
+function onTextSort(e) {
+    console.log("On text sort", e)
 }
 
 function onSizeSort() {

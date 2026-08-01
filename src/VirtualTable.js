@@ -1,9 +1,6 @@
 import './Scrollbar.js'
 import { ColumnsHeader } from "./ColumnsHeader.js"
 
-// TODO columns: sorting items by sort function
-// TODO columns: custom rendering for sub sorting
-
 // TODO scrollbar hidden: transition
 // TODO scrollbar active transition
 // TODO scrollbar active margin right transition
@@ -171,7 +168,7 @@ export class VirtualTable extends HTMLElement {
             th.sortable span:hover {
                 background-color: var(--vtc-caption-background-hover-color);
             }
-            .sortAscending .sortable:before, .sortAscending.sortable:before {
+            .sortable .sortAscending:before, .sortable.sortAscending:before {
                 position: relative;
                 bottom: 11px;
                 border-left: 4px solid transparent;
@@ -180,7 +177,7 @@ export class VirtualTable extends HTMLElement {
                 content: '';
                 margin-right: 5px;
             }
-            .sortDescending .sortable:before, .sortDescending.sortable:before {
+            .sortable .sortDescending:before, .sortable.sortDescending:before {
                 position: relative;
                 top: 10px;
                 border-left: 4px solid transparent;
