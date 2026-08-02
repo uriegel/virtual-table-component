@@ -1,8 +1,6 @@
 import './Scrollbar.js'
 import { ColumnsHeader } from "./ColumnsHeader.js"
 
-// TODO scrollbar hidden: transition
-// TODO scrollbar active transition
 // TODO scrollbar active margin right transition
 // TODO scrollbar page up/down
 // TODO Styling with color filters

@@ -38,6 +38,10 @@ export class Scrollbar extends HTMLElement {
                 transform-origin: right top;
                 bottom: 0px;    
             }
+            #scrollbar.hidden {
+                transform: scale(0);
+                opacity: 0;            
+            }
             #grip {
                 position: absolute;
                 border-radius: var(--vtc-scrollbar-grip-radius);
@@ -123,7 +127,10 @@ export class Scrollbar extends HTMLElement {
 
     setRange() {
         const range = Math.max(0, this.count - this.displayCount)
-        this.style.setProperty('display', range > 0 ? '' : 'none')  
+        if (range > 0)
+            this.classList.remove('hidden')  
+        else
+            this.classList.add('hidden')  
         return range
     } 
 

@@ -44,7 +44,7 @@ tableView.addEventListener("render-rowitem", evt => {
 })
 
 fill.onclick = () => {
-    tableView.setItems(Array.from({ length: 70_000 }, (value, index) => ({
+    tableView.setItems(Array.from({ length: 7 }, (value, index) => ({ // 70_000
         name: `Item with index: ${index}`,
         date: "12/7/2026 14:18",
         index: index
