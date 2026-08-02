@@ -1,7 +1,6 @@
 import './Scrollbar.js'
 import { ColumnsHeader } from "./ColumnsHeader.js"
 
-// TODO scrollbar active margin right transition
 // TODO scrollbar page up/down
 // TODO Styling with color filters
 // TODO Styling columns
@@ -155,6 +154,9 @@ export class VirtualTable extends HTMLElement {
             }
             th:first-child {
                 border-left-width: 0px;
+            }
+            #root:has(#scrollbar:hover) tr td:last-child, #root:has(#grip:active) tr td:last-child {
+                padding-right: calc(3px + var(--vtc-scrollbar-right-margin));
             }
             th.sortable, th.sortable span {
                 background-color: transparent;
