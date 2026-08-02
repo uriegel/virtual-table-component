@@ -1,9 +1,6 @@
 import './Scrollbar.js'
 import { ColumnsHeader } from "./ColumnsHeader.js"
 
-// TODO settings columns widths
-// TODO signalling columns widths changes
-
 // TODO scrollbar hidden: transition
 // TODO scrollbar active transition
 // TODO scrollbar active margin right transition
@@ -82,7 +79,7 @@ export class VirtualTable extends HTMLElement {
         this.table = document.createElement("table")
         this.tableHead = document.createElement("thead")
         this.tableHeadRow = document.createElement("tr")
-        this.columnsHeader = new ColumnsHeader(this.tableHeadRow, evt => this.onSort(evt))
+        this.columnsHeader = new ColumnsHeader(this.tableHeadRow, evt => this.onSort(evt), evt => this.onColumnWidthChange(evt))
         this.tableHead.appendChild(this.tableHeadRow)
         this.table.appendChild(this.tableHead)
         this.tableBody = document.createElement("tbody")
@@ -207,8 +204,16 @@ export class VirtualTable extends HTMLElement {
         this.scrollbar.setHeightOffset(this.tableHeadRow.clientHeight)
     }
 
+    setColumnWidths(widths) {
+        this.columnsHeader.setWidths(widths)
+    }
+
     setOnSort(cb) {
         this.onSort = cb
+    }
+
+    setOnColumnWidthChange(cb) {
+        this.onColumnWidthChange = cb
     }
 
     setItems(items, pos) {

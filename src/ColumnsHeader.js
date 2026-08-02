@@ -1,11 +1,12 @@
 export class ColumnsHeader {
-    constructor(tableHeadRow, sort) {
+    constructor(tableHeadRow, sort, onColumnWidthChange) {
         this.tableHeadRow = tableHeadRow
         this.tableHeadRow.addEventListener("mousemove", evt => this.onMouseMove(evt))
         this.tableHeadRow.addEventListener("mousedown", evt => this.onMouseDown(evt))
         this.sortIndex = -1
         this.sortDescending = true // to initial turn to false
         this.sort = sort
+        this.onColumnWidthChange = onColumnWidthChange
     }
 
     setColumns(columns) {
@@ -37,6 +38,11 @@ export class ColumnsHeader {
                 th.classList.add("sortable")
             this.tableHeadRow.appendChild(th)
         })
+    }
+
+    setWidths(widths) {
+        const ths = Array.from(this.tableHeadRow.children)
+        ths.forEach((th, idx) => th.style.width = `${widths[idx]}%`)
     }
 
     isRightAligned(idx) { return this.columns[idx].isRightAligned }
@@ -123,14 +129,15 @@ export class ColumnsHeader {
                 return ths.map(th => 
                     th.style.width 
                         ? parseFloat(th.style.width.substring(0, th.style.width.length - 1))
-                        : 100 / columns.length
+                        : 100 / this.columns.length
                 )
             }
 
             window.removeEventListener('mousemove', onmove)
             window.removeEventListener('mouseup', onup)
             document.body.style.cursor = 'auto'
-            //setColumnWidths(getWidths())
+            if (this.onColumnWidthChange)
+                this.onColumnWidthChange(getWidths())
             preventClickOnResetting()
             evt.preventDefault()
             evt.stopPropagation()

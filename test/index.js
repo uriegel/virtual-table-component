@@ -5,11 +5,15 @@ tableView.setStylesheet("styles/tableview.css")
 const fill = document.getElementById("fill")
 
 tableView.setOnSort(onSort)
+tableView.setOnColumnWidthChange(onColumnWidthChange)
 tableView.setColumns([
     { text: "Name", sortable: true, subColumn: "Type" }, 
     { text: "Date" }, 
     { text: "Size", isRightAligned: true, sortable: true }, 
 ])
+const widths = localStorage.getItem("columnWidths") 
+if (widths)
+    tableView.setColumnWidths(JSON.parse(widths))    
 
 tableView.addEventListener("create-rowitem", evt => {
     const template = document.getElementById('item')
@@ -54,6 +58,11 @@ tableView.addEventListener("process-selected", evt => {
 
 function onSort(e) {
     console.log("On sort", e)
+}
+
+function onColumnWidthChange(cols) {
+    console.log("On width change", cols)
+    localStorage.setItem("columnWidths", JSON.stringify(cols))
 }
 
 tableView.focus()
