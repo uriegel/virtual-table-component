@@ -1,6 +1,9 @@
 import './Scrollbar.js'
 import { ColumnsHeader } from "./ColumnsHeader.js"
 
+// TODO Dblclk on header and on empty part: index out of range
+// TODO on OnSort callback for all columns
+
 // TODO scrollbar hidden: transition
 // TODO scrollbar active transition
 // TODO scrollbar active margin right transition
