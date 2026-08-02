@@ -1,10 +1,11 @@
 export class ColumnsHeader {
-    constructor(tableHeadRow) {
+    constructor(tableHeadRow, sort) {
         this.tableHeadRow = tableHeadRow
         this.tableHeadRow.addEventListener("mousemove", evt => this.onMouseMove(evt))
         this.tableHeadRow.addEventListener("mousedown", evt => this.onMouseDown(evt))
         this.sortIndex = -1
         this.sortDescending = true // to initial turn to false
+        this.sort = sort
     }
 
     setColumns(columns) {
@@ -32,7 +33,7 @@ export class ColumnsHeader {
                 th.classList.add("rightAligned")
             else
                 th.classList.remove("rightAligned")
-            if (item.sort)
+            if (item.sortable)
                 th.classList.add("sortable")
             this.tableHeadRow.appendChild(th)
         })
@@ -144,7 +145,7 @@ export class ColumnsHeader {
     onColumnClick(idx, evt) {
         if (this.dragging)
             return
-        if (this.columns[idx].sort) {
+        if (this.columns[idx].sortable) {
             const ths = Array.from(this.tableHeadRow.children)
             if (this.sortIndex != -1) {
                 if (!this.columns[this.sortIndex].subColumn)
@@ -157,21 +158,23 @@ export class ColumnsHeader {
                 }
             }
             this.sortDescending = !this.sortDescending
+            this.subColumn = false
             if (!this.columns[idx].subColumn)
                 ths[idx].classList.add(this.sortDescending ? "sortDescending" : "sortAscending")
             else {
                 if (evt.originalTarget.classList.contains("subColumn")) {
                     this.subColumn = true
                     evt.originalTarget.classList.add(this.sortDescending ? "sortDescending" : "sortAscending")
-                } else {
-                    this.subColumn = false
+                } else 
                     evt.originalTarget.classList.add(this.sortDescending ? "sortDescending" : "sortAscending")
-                }
             }
-            this.columns[idx].sort({
-                subColumn: this.subColumn || undefined,
-                descending: this.sortDescending
-            })
+            
+            if (this.sort)
+                this.sort({
+                    index: idx,
+                    subColumn: this.subColumn || undefined,
+                    descending: this.sortDescending
+                })
             this.sortIndex = idx
         }
     }

@@ -4,10 +4,11 @@ const tableView = document.getElementById("virtual-table")
 tableView.setStylesheet("styles/tableview.css")
 const fill = document.getElementById("fill")
 
+tableView.setOnSort(onSort)
 tableView.setColumns([
-    { text: "Name", sort: onTextSort, subColumn: "Type" }, 
+    { text: "Name", sortable: true, subColumn: "Type" }, 
     { text: "Date" }, 
-    { text: "Size", isRightAligned: true, sort: onSizeSort }, 
+    { text: "Size", isRightAligned: true, sortable: true }, 
 ])
 
 tableView.addEventListener("create-rowitem", evt => {
@@ -51,12 +52,8 @@ tableView.addEventListener("process-selected", evt => {
     console.log("Process", evt.detail.pos)
 })
 
-function onTextSort(e) {
-    console.log("On text sort", e)
-}
-
-function onSizeSort() {
-    console.log("On size sort")
+function onSort(e) {
+    console.log("On sort", e)
 }
 
 tableView.focus()
