@@ -60,10 +60,8 @@ export class VirtualTable extends HTMLElement {
     }
 
     set currentPosition(val) {
-        if (this.#currentPosition != val) {
-            this.#currentPosition = val
-            this.onPositionChanged()
-        }
+        this.#currentPosition = val
+        this.onPositionChanged()
     }
 
     set offset(val) {
@@ -454,7 +452,7 @@ export class VirtualTable extends HTMLElement {
         if (scroll)
             this.scrollToOffset()
     }
-    
+
     onPositionChanged() {
         if (this.currentPosition == Infinity || this.currentPosition < 0)
             return
