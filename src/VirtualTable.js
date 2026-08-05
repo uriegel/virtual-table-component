@@ -1,10 +1,6 @@
 import './Scrollbar.js'
 import { ColumnsHeader } from "./ColumnsHeader.js"
 
-// TODO scrollbar page up/down
-// TODO Styling with color filters
-// TODO Styling columns
-
 export class VirtualTable extends HTMLElement {
     #offset = 0
     #currentPosition = 0

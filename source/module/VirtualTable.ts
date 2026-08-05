@@ -1,5 +1,12 @@
 import { loadStylesheet } from "./index.js"
 
+// TODO begin with ColumnHeaders
+// TODO then scrollbar
+// TODO then virtual table
+// TODO scrollbar page up/down
+// TODO Styling with color filters
+// TODO Styling columns
+
 export class VirtualTable extends HTMLElement {
     constructor() {
         super()
