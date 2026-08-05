@@ -7,6 +7,7 @@ import { ColumnsHeader } from "./ColumnsHeader.js"
 
 export class VirtualTable extends HTMLElement {
     #offset = 0
+    #currentPosition = 0
 
     constructor() {
         super()
@@ -54,6 +55,15 @@ export class VirtualTable extends HTMLElement {
         }`
     }
 
+    get currentPosition() {
+        return this.#currentPosition
+    }
+
+    set currentPosition(val) {
+        this.#currentPosition = val
+        this.onPositionChanged()
+    }
+
     set offset(val) {
         if (this.#offset != val)
             this.scrollbar.scrollPosition = val
@@ -70,8 +80,6 @@ export class VirtualTable extends HTMLElement {
         this.root.id = "root"
         this.root.setAttribute("tabindex", "0")
         this.root.addEventListener("keydown", evt => this.onKeyDown(evt))
-        this.root.addEventListener("mousedown", evt => this.onMouseDown(evt))
-        this.root.addEventListener("dblclick", () => this.onSelected())
         this.root.addEventListener("wheel", evt => this.onWheel(evt))
         this.table = document.createElement("table")
         this.tableHead = document.createElement("thead")
@@ -80,6 +88,8 @@ export class VirtualTable extends HTMLElement {
         this.tableHead.appendChild(this.tableHeadRow)
         this.table.appendChild(this.tableHead)
         this.tableBody = document.createElement("tbody")
+        this.tableBody.addEventListener("mousedown", evt => this.onMouseDown(evt))
+        this.tableBody.addEventListener("dblclick", () => this.onSelected())
         this.table.appendChild(this.tableBody)
         this.root.appendChild(this.table)
         this.scrollbar = document.createElement("scroll-bar")
@@ -441,6 +451,17 @@ export class VirtualTable extends HTMLElement {
         this.offset = evt.detail.pos
         if (scroll)
             this.scrollToOffset()
+    }
+
+    onPositionChanged() {
+        if (this.currentPosition == Infinity || this.currentPosition < 0)
+            return
+        const event = new CustomEvent('position-changed', {
+            bubbles: false,
+            cancelable: false,
+            detail: { pos: this.currentPosition }
+        })
+        this.dispatchEvent(event)
     }
 
     onSelected() {

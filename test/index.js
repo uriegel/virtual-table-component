@@ -42,6 +42,9 @@ tableView.addEventListener("render-rowitem", evt => {
     const element3 = tr.querySelector('#item3')
     element3.textContent = `${evt.detail.item.index}`
 })
+tableView.addEventListener("position-changed", evt => {
+    console.log("Position changed", evt.detail.pos)
+})
 
 fill.onclick = () => {
     tableView.setItems(Array.from({ length: 70_000 }, (value, index) => ({
