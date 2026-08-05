@@ -1,0 +1,35 @@
+:root {
+    --vtc-current-color: lightgray;
+    --vtc-current-focus-color: red;
+    --vtc-font-size: 100%;
+    --vtc-selected-background-color: blue;
+    --vtc-scrollbar-width: 12px;
+
+    --vtc-scrollbar-grip-width: 4px;
+    --vtc-scrollbar-grip-radius: 999px;
+    --vtc-scrollbar-grip-color: gray;
+    --vtc-scrollbar-grip-active-color: var(--vtc-selected-background-color);
+    --vtc-scrollbar-grip-right: 1px;
+    
+    --vtc-scrollbar-border-color: gray;
+    --vtc-scrollbar-border-width: 1px;
+    --vtc-scrollbar-background-color: white;
+    --vtc-scrollbar-button-background-color: white;
+    --vtc-scrollbar-button-color: #666;
+    --vtc-scrollbar-button-hover-color: #555;
+    --vtc-scrollbar-button-active-color: #444;
+    --vtc-scrollbar-button-hover-background-color: rgb(209, 209, 209);
+    --vtc-scrollbar-button-active-background-color: #aaa;
+    --vtc-scrollbar-grip-color: rgb(209, 209, 209); 
+    --vtc-scrollbar-grip-hover-color: #bbb;
+    --vtc-scrollbar-right-margin: 15px;
+    --vtc-caption-color: gray;
+    --vtc-caption-background-color: #efefef;
+    --vtc-caption-background-hover-color: lightgray;
+    --vtc-caption-separator-color: white;
+}
+@media (prefers-color-scheme: dark) {
+    :root {
+        --vtc-caption-background-color: #212121;
+    }
+}

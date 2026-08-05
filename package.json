@@ -9,6 +9,7 @@
     "src": "src"
   },
   "scripts": {
+    "build": "tsc && node copy-assets.mjs",
     "do publish test": "npm publish --dry-run",
     "do publish": "npm publish"
   },
@@ -25,5 +26,5 @@
   "bugs": {
     "url": "https://github.com/uriegel/virtual-table-component/issues"
   },
-  "homepage": "https://github.com/uriegel/virtual-table-component#readme",
+  "homepage": "https://github.com/uriegel/virtual-table-component#readme"
 }

@@ -1,0 +1,4 @@
+#root {
+    background-color: var(--vtc-scrollbar-button-background-color);
+    color: var(--vtc-current-focus-color);
+}
