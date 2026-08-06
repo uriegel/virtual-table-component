@@ -20,10 +20,6 @@
                 "reveal": "silent"
             },
             "problemMatcher": "$msCompile"
-        }, {
-            "label": "Build TypeScript",
-            "type": "shell",
-            "command": "npm run build"
         }
     ]
 }
