@@ -1,6 +1,10 @@
 import './Scrollbar.js'
 import { ColumnsHeader } from "./ColumnsHeader.js"
 
+// TODO scrollbar page up/down
+// TODO Styling with color filters
+// TODO Styling columns
+
 export class VirtualTable extends HTMLElement {
     #offset = 0
     #currentPosition = 0
@@ -243,6 +247,8 @@ export class VirtualTable extends HTMLElement {
             })
     }
 
+    getItems() { return this.items }
+
     setPosition(newPos) {
         const up = newPos < this.currentPosition
         newPos = up ? Math.max(newPos, 0) : Math.min(newPos, this.items.length - 1)
@@ -268,6 +274,11 @@ export class VirtualTable extends HTMLElement {
         style.textContent = cssText
         // Append style to shadow root
         this.shadow.append(style)
+    }
+
+    refresh() {
+        const elements = Array.from(this.tableBody.children)
+        elements.forEach((element, idx) => this.renderRowItem(element, this.items[this.offset + idx]))
     }
 
     measure() {
