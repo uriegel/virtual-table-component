@@ -226,8 +226,10 @@ export class VirtualTable extends HTMLElement {
         this.onColumnWidthChange = cb
     }
 
-    setItems(items) {
-        this.currentPosition = 0
+    setItems(items, dontResetPosition) {
+        this.#currentPosition = 0
+        if (!dontResetPosition)
+            this.onPositionChanged()
         this.offset = 0
         this.items = items
         if (this.itemHeight == 0)
@@ -423,7 +425,7 @@ export class VirtualTable extends HTMLElement {
             this.currentPosition = 0
             this.scrollToOffset()
         }
-        else if (evt.key == "Enter") {
+        else if (evt.key == "Enter" && !evt.altKey && !evt.ctrlKey) {
             evt.preventDefault()
             evt.stopPropagation()
             this.onSelected()
